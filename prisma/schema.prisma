@@ -7,20 +7,42 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
+
+model RssSource {
+  id          Int      @id @default(autoincrement()) // 主键，自增
+  sourceUrl   String   @unique // 文章来源 URL，唯一
+  sourceTitle String // 文章来源标题
+  createdAt   DateTime @default(now()) // 创建时间，默认为当前时间
+  updatedAt   DateTime @updatedAt // 更新时间戳
+
+  // 关系字段
+  articles Article[] // 与 Article 表的关系 (一对多)
+}
+
 model Article {
-  id          Int      @id @default(autoincrement())
-  guid        String?   @unique
-  url         String   @unique
-  title       String
-  content     String?
-  updated     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([updated])
-
+  id                Int       @id @default(autoincrement()) // 主键，自增
+  rssSourceId       Int // 关联的 RSS 源 ID
+  articleId         String?   @unique // 文章 ID，唯一
+  guid              String?   @unique // 全局唯一标识符
+  articleUrl        String // 文章 URL
+  title             String // 文章标题
+  content           String? // 文章内容
+  translatedContent String? // 翻译后的文章内容
+  summary           String? // 文章摘要
+  translatedSummary String? // 翻译后的文章摘要
+  contentAudio      String? // 内容的音频
+  summaryAudio      String? // 摘要的音频
+  translatedAudio   String? // 翻译后摘要的音频
+  status            String    @default("NOT_STARTED") // 处理状态，默认为 "NOT_STARTED"，并创建索引
+  errorMessage      String? // 错误消息
+  updated           DateTime? // 更新时间,rss信息提供的文章更新时间
+  updatedAt         DateTime  @updatedAt // 更新时间戳,系统自动生成
+  createdAt         DateTime  @default(now()) // 创建时间，系统自动生成
+  // 关联关系字段
+  rssSource         RssSource @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
 }
