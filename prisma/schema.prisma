@@ -17,6 +17,7 @@ model RssSource {
   id          Int      @id @default(autoincrement()) // 主键，自增
   sourceUrl   String   @unique // 文章来源 URL，唯一
   sourceTitle String // 文章来源标题
+  customName  String? // 用户自定义名称
   createdAt   DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt   DateTime @updatedAt // 更新时间戳
 
