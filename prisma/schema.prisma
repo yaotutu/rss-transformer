@@ -26,9 +26,9 @@ model RssSource {
 
 model Article {
   id                Int       @id @default(autoincrement()) // 主键，自增
-  rssSourceId       Int // 关联的 RSS 源 ID
-  articleId         String?   @unique // 文章 ID，唯一
-  guid              String?   @unique // 全局唯一标识符
+  sourceUrl         String // 关联的 RSS 源 ID
+  articleId         String? // 文章 ID，rss订阅源自动生成，在特定的url下是唯一
+  articleGuid       String? // 文章 guid，rss订阅源自动生成，在特定的url下是唯一
   articleUrl        String // 文章 URL
   title             String // 文章标题
   content           String? // 文章内容
@@ -44,5 +44,5 @@ model Article {
   updatedAt         DateTime  @updatedAt // 更新时间戳,系统自动生成
   createdAt         DateTime  @default(now()) // 创建时间，系统自动生成
   // 关联关系字段
-  rssSource         RssSource @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
+  rssSource         RssSource @relation(fields: [sourceUrl], references: [sourceUrl]) // 与 RssSource 表的关系
 }
