@@ -9,6 +9,13 @@ export class CreateRssDto {
 	@IsUrl()
 	readonly url: string;
 
+	@ApiProperty({
+		description: "rss唯一id,用于生成每一条rss订阅源",
+		example: "1234",
+	})
+	@IsString()
+	readonly rssID: string;
+
 	@ApiPropertyOptional({
 		description: "Custom name for the RSS feed",
 		example: "Example RSS Feed",

@@ -34,7 +34,7 @@ export class RssController {
 
 	@Get(":id")
 	findOne(@Param("id") id: string) {
-		return this.rssService.findOne(+id);
+		// return this.rssService.findOne(+id);
 	}
 
 	@Patch(":id")

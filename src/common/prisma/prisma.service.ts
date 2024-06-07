@@ -1,5 +1,4 @@
 // prisma.service.ts
-
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 
@@ -11,10 +10,15 @@ export class PrismaService {
 		this.prisma = new PrismaClient();
 	}
 
-	async createRssSource(url: string, customName?: string): Promise<string> {
+	async createRssSource(sourceInfo: {
+		sourceUrl: string;
+		rssID: string;
+		sourceTitle?: string;
+	}): Promise<string> {
+		const { sourceUrl, sourceTitle, rssID } = sourceInfo;
 		// Check if the RSS source already exists
 		const existingRssSource = await this.prisma.rssSource.findUnique({
-			where: { sourceUrl: url },
+			where: { rssID },
 		});
 
 		if (existingRssSource) {
@@ -25,8 +29,9 @@ export class PrismaService {
 		try {
 			await this.prisma.rssSource.create({
 				data: {
-					sourceUrl: url,
-					sourceTitle: customName || url, // Use customName if provided, otherwise use url
+					rssID,
+					sourceUrl,
+					sourceTitle: sourceTitle || sourceUrl, // Use sourceTitle if provided, otherwise use sourceUrl
 				},
 			});
 			return "RSS source created successfully.";

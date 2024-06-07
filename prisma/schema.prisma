@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,9 +9,10 @@ datasource db {
 
 model RssSource {
   id          Int      @id @default(autoincrement()) // 主键，自增
-  sourceUrl   String   @unique // 文章来源 URL，唯一
-  sourceTitle String // 文章来源标题
-  customName  String? // 用户自定义名称
+  sourceUrl   String   // 文章来源 URL，不再是唯一
+  sourceTitle String   // 文章来源标题
+  rssID       String   @unique// RSS ID,用于生成rss源,以及作为唯一索引.
+  customName  String?  // 用户自定义名称
   createdAt   DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt   DateTime @updatedAt // 更新时间戳
 
@@ -27,23 +22,24 @@ model RssSource {
 
 model Article {
   id                Int       @id @default(autoincrement()) // 主键，自增
-  sourceUrl         String // 关联的 RSS 源 ID
-  articleId         String? // 文章 ID，rss订阅源自动生成，在特定的url下是唯一
-  articleGuid       String? // 文章 guid，rss订阅源自动生成，在特定的url下是唯一
-  articleUrl        String // 文章 URL
-  title             String // 文章标题
-  content           String? // 文章内容
-  translatedContent String? // 翻译后的文章内容
-  summary           String? // 文章摘要
-  translatedSummary String? // 翻译后的文章摘要
-  contentAudio      String? // 内容的音频
-  summaryAudio      String? // 摘要的音频
-  translatedAudio   String? // 翻译后摘要的音频
-  status            String    @default("NOT_STARTED") // 处理状态，默认为 "NOT_STARTED"，并创建索引
-  errorMessage      String? // 错误消息
+  rssSourceId       Int       // 关联的 RSS 源 ID，指向 RssSource 表的主键
+  articleId         String?   // 文章 ID，rss订阅源自动生成，在特定的url下是唯一
+  articleGuid       String?   // 文章 guid，rss订阅源自动生成，在特定的url下是唯一
+  articleUrl        String    // 文章 URL
+  title             String    // 文章标题
+  content           String?   // 文章内容
+  translatedContent String?   // 翻译后的文章内容
+  summary           String?   // 文章摘要
+  translatedSummary String?   // 翻译后的文章摘要
+  contentAudio      String?   // 内容的音频
+  summaryAudio      String?   // 摘要的音频
+  translatedAudio   String?   // 翻译后摘要的音频
+  status            String    @default("NOT_STARTED") // 处理状态，默认为 "NOT_STARTED"
+  errorMessage      String?   // 错误消息
   updated           DateTime? // 更新时间,rss信息提供的文章更新时间
   updatedAt         DateTime  @updatedAt // 更新时间戳,系统自动生成
   createdAt         DateTime  @default(now()) // 创建时间，系统自动生成
+  
   // 关联关系字段
-  rssSource         RssSource @relation(fields: [sourceUrl], references: [sourceUrl]) // 与 RssSource 表的关系
+  rssSource         RssSource @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
 }
