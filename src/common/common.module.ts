@@ -2,10 +2,10 @@
 import { Module } from "@nestjs/common";
 import { ResponseInterceptor } from "./interceptors/response.interceptor";
 import { WinstonService } from "./logger/winston.service";
-import { PrismaService } from "./prisma/prisma.service";
+import { RssPrismaService } from "./prisma/rss-prisma.service";
 
 @Module({
-	providers: [ResponseInterceptor, WinstonService, PrismaService],
-	exports: [ResponseInterceptor, WinstonService, PrismaService],
+	providers: [ResponseInterceptor, WinstonService, RssPrismaService],
+	exports: [ResponseInterceptor, WinstonService, RssPrismaService],
 })
 export class CommonModule {}

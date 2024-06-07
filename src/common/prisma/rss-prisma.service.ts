@@ -1,12 +1,12 @@
 // prisma.service.ts
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, RssSource } from "@prisma/client";
 import { WinstonService } from "../logger/winston.service";
 import { ApiResponse } from "../dto/common.dto";
 import { ErrorCode } from "src/types";
 
 @Injectable()
-export class PrismaService {
+export class RssPrismaService {
 	private readonly prisma: PrismaClient;
 
 	constructor(private winstonService: WinstonService) {
@@ -53,6 +53,21 @@ export class PrismaService {
 				error,
 			);
 			throw new InternalServerErrorException("Failed to create RSS source.");
+		}
+	}
+
+	async getAllRssSources(): Promise<RssSource[] | ApiResponse<string>> {
+		try {
+			return await this.prisma.rssSource.findMany();
+		} catch (error) {
+			this.winstonService.error(
+				"DATABASE",
+				"Failed to fetch all RSS sources.",
+				error,
+			);
+			throw new InternalServerErrorException(
+				"Failed to fetch all RSS sources.",
+			);
 		}
 	}
 }

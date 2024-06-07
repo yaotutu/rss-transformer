@@ -11,13 +11,10 @@ import {
 import { RssService } from "./rss.service";
 import { CreateRssDto } from "./dto/create-rss.dto";
 import { UpdateRssDto } from "./dto/update-rss.dto";
-import { CoreRssProcessorService } from "src/core-rss-processor/core-rss-processor.service";
 
 @Controller("rss")
 export class RssController {
-	constructor(
-		private readonly rssService: RssService,
-	) {}
+	constructor(private readonly rssService: RssService) {}
 
 	@Post()
 	create(@Body() createRssDto: CreateRssDto) {
@@ -25,17 +22,10 @@ export class RssController {
 	}
 
 	@Get()
-	findAll(@Query("url") url: string) {
-		if (!url) {
-			throw new Error("URL parameter is required.");
-		}
-		return this.rssService.fetchRssData(url);
+	findAll() {
+    return this.rssService.getAllRssSources()
 	}
 
-	@Get(":id")
-	findOne(@Param("id") id: string) {
-		// return this.rssService.findOne(+id);
-	}
 
 	@Patch(":id")
 	update(@Param("id") id: string, @Body() updateRssDto: UpdateRssDto) {

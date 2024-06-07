@@ -8,19 +8,25 @@ import { CreateRssDto } from "./dto/create-rss.dto";
 import { UpdateRssDto } from "./dto/update-rss.dto";
 import * as Parser from "rss-parser";
 import { WinstonService } from "src/common/logger/winston.service";
-import { PrismaService } from "src/common/prisma/prisma.service";
+import { RssPrismaService } from "src/common/prisma/rss-prisma.service";
 
 @Injectable()
 export class RssService {
 	private parser: Parser<any, any>;
 	constructor(
 		private winstonService: WinstonService,
-		private prisma: PrismaService,
+		private prisma: RssPrismaService,
 	) {
 		this.parser = new Parser({
 			headers: { Accept: "application/rss+xml, text/xml; q=0.1" },
 		});
 	}
+
+	getAllRssSources() {
+		return this.prisma.getAllRssSources();
+		// return await this.RssPrismaService.rssSource.findMany();
+	}
+
 	async create(_createRssDto: CreateRssDto) {
 		const { sourceUrl, rssID } = _createRssDto;
 		let title = "";
@@ -38,13 +44,6 @@ export class RssService {
 				"RSS feed is currently unavailable. Please try again later.",
 			);
 		}
-
-		this.prisma.createRssSource({
-			rssID: _createRssDto.rssID,
-			sourceUrl: "https://www.williamlong.info/1",
-			sourceTitle: "test title",
-		});
-		// throw new NotFoundException("未找到");
 	}
 
 	update(id: number, _updateRssDto: UpdateRssDto) {
