@@ -13,16 +13,15 @@ export class ResponseInterceptor<T>
 	implements NestInterceptor<T, ApiResponse<T>>
 {
 	intercept(
-		context: ExecutionContext,
+		_context: ExecutionContext,
 		next: CallHandler<T>,
 	): Observable<ApiResponse<T>> {
 		return next.handle().pipe(
 			map((data) => {
-				return {
-					statusCode: 200,
-					message: "Success",
-					data,
-				};
+				if (data instanceof ApiResponse) {
+					return data; // 如果已经是 ApiResponse 格式，直接返回
+				}
+				return new ApiResponse(200, "Success", data);
 			}),
 		);
 	}

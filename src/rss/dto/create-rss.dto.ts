@@ -7,7 +7,7 @@ export class CreateRssDto {
 		example: "http://example.com/rss",
 	})
 	@IsUrl()
-	readonly url: string;
+	readonly sourceUrl: string;
 
 	@ApiProperty({
 		description: "rss唯一id,用于生成每一条rss订阅源",

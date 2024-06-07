@@ -11,4 +11,4 @@ export type InfoType =
   | 'DATABASE_INFO'
   | 'GENERAL_INFO';
 
-export type LogType = "RSS_PARSER" | "HTTP" | "DATABASE" | "GENERAL"
+export type LogType = "RSS_PARSER" | "HTTP" | "DATABASE" | "GENERAL" | "ADD_RSS_SOURCE"

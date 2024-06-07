@@ -2,6 +2,7 @@ import {
 	HttpException,
 	HttpStatus,
 	Injectable,
+	ServiceUnavailableException,
 } from "@nestjs/common";
 import { CreateRssDto } from "./dto/create-rss.dto";
 import { UpdateRssDto } from "./dto/update-rss.dto";
@@ -17,11 +18,27 @@ export class RssService {
 		private prisma: PrismaService,
 	) {
 		this.parser = new Parser({
-			// headers: { Accept: "application/rss+xml, text/xml; q=0.1" },
+			headers: { Accept: "application/rss+xml, text/xml; q=0.1" },
 		});
 	}
-	create(_createRssDto: CreateRssDto) {
-		// const { rssID,sourceUrl,sourceTitle} = _createRssDto;
+	async create(_createRssDto: CreateRssDto) {
+		const { sourceUrl, rssID } = _createRssDto;
+		let title = "";
+		try {
+			const feed = await this.fetchRssData(sourceUrl);
+			title = feed.title;
+			return await this.prisma.createRssSource({
+				rssID: rssID,
+				sourceUrl: sourceUrl,
+				sourceTitle: title,
+			});
+		} catch (error) {
+			this.winstonService.error("ADD_RSS_SOURCE", "添加RSS源时出错", error);
+			throw new ServiceUnavailableException(
+				"RSS feed is currently unavailable. Please try again later.",
+			);
+		}
+
 		this.prisma.createRssSource({
 			rssID: _createRssDto.rssID,
 			sourceUrl: "https://www.williamlong.info/1",
