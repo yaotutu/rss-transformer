@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { IsIn, IsNotEmpty } from "class-validator";
+
+export type TaskType = "UPDATE_ITEM" | "TRANSLATE";
 
 export class CreateItemDto {
 	@ApiProperty({
@@ -8,6 +10,13 @@ export class CreateItemDto {
 	})
 	@IsNotEmpty()
 	readonly rssSourceID: number;
-  readonly taskType: "UPDATE_ITEM"
-}
 
+	@ApiProperty({
+		description: "任务类型",
+		example: "UPDATE_ITEM",
+		enum: ["UPDATE_ITEM", "TRANSLATE"],
+	})
+	@IsNotEmpty()
+	@IsIn(["UPDATE_ITEM", "TRANSLATE"])
+	readonly taskType: TaskType;
+}

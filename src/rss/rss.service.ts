@@ -5,8 +5,8 @@ import {
 	ServiceUnavailableException,
 } from "@nestjs/common";
 import { CreateRssDto } from "./dto/create-rss.dto";
-import { UpdateRssDto } from "./dto/update-rss.dto";
 import * as Parser from "rss-parser";
+import { createHash } from "node:crypto";
 import { WinstonService } from "src/common/logger/winston.service";
 import { RssPrismaService } from "src/common/prisma/rss-prisma.service";
 
@@ -42,16 +42,68 @@ export class RssService {
 		}
 	}
 
-	updateItemByRssSourceID(id: number) {
-		return `${id} 任务进行中`;
+	/**
+	 * Generates a unique article ID based on the URL and content of an article.
+	 * @param {string} url - The URL of the article.
+	 * @param {string} content - The content of the article.
+	 * @returns {string} - A unique hash ID.
+	 */
+	generateUniqueArticleId(url: string, content: string): string {
+		const hash = createHash("sha256");
+		hash.update(url + content);
+		return hash.digest("hex");
 	}
 
-	update(id: number, _updateRssDto: UpdateRssDto) {
-		return `This action updates a #${id} rss`;
-	}
+	// async updateItemByRssSourceID(id: number) {
+	//    const rssSource = await this.rssPrismaService.getRssSourceById(id);
+	//
+	//    const feed = await this.fetchRssData(rssSource.sourceUrl);
+	//    const items = feed.items;
+	// 	return `${JSON.stringify(feed)} 任务进行中`;
+	// }
+	/**
+	 * Updates RSS items by RSS source ID.
+	 * @param {number} id - The ID of the RSS source.
+	 * @returns {Promise<string>} - A message indicating the update status.
+	 */
+	async updateItemByRssSourceID(id: number): Promise<string> {
+		try {
+			const rssSource = await this.rssPrismaService.getRssSourceById(id);
 
-	remove(id: number) {
-		return `This action removes a #${id} rss`;
+			const feed = await this.fetchRssData(rssSource.sourceUrl);
+			const items = feed.items.map((item) => ({
+				rssSourceId: id,
+				itemUrl: item.link,
+				itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
+				uniqueArticleId: this.generateUniqueArticleId(
+					item.link,
+					item.content || item.description || "",
+				),
+			}));
+
+			const { createdCount, skippedCount } =
+				await this.rssPrismaService.createRssItems(id, items);
+
+			this.winstonService.info(
+				"UPDATE_RSS_ITEMS",
+				`Stored ${createdCount} new RSS items.`,
+			);
+			if (skippedCount > 0) {
+				this.winstonService.info(
+					"UPDATE_RSS_ITEMS",
+					`Skipped ${skippedCount} existing RSS items.`,
+				);
+			}
+
+			return `RSS items updated successfully for source ID ${id}.`;
+		} catch (error) {
+			// Log the error and throw a new exception
+			this.winstonService.error(
+				"UPDATE_RSS_ITEMS",
+				"Failed to update RSS items",
+				error,
+			);
+		}
 	}
 
 	async fetchRssData(url: string) {

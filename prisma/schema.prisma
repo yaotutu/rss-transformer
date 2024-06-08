@@ -23,17 +23,13 @@ model RssSource {
 
 // RssItem 模型：存储每个 RSS 条目的详细信息
 model RssItem {
-  id          Int       @id @default(autoincrement()) // 主键，自增
-  rssSourceId Int // 关联的 RSS 源 ID，指向 RssSource 表的主键
-  articleId   String? // 文章 ID，RSS 订阅源自动生成，在特定的 URL 下是唯一的
-  articleGuid String? // 文章 GUID，RSS 订阅源自动生成，在特定的 URL 下是唯一的
-  articleUrl  String // 文章 URL
-  title       String? // 文章标题
-  content     String? // 文章内容
-  status      String? // 处理状态
-  updated     DateTime? // 更新时间，RSS 信息提供的文章更新时间
-  updatedAt   DateTime  @updatedAt // 更新时间戳，系统自动生成
-  createdAt   DateTime  @default(now()) // 创建时间，系统自动生成
+  id              Int       @id @default(autoincrement()) // 主键，自增
+  rssSourceId     Int // 关联的 RSS 源 ID，指向 RssSource 表的主键
+  uniqueArticleId String // 根据文章内容+url hash生成的唯一id
+  itemUrl         String // 文章 URL
+  itemOriginInfo  String? // 每一个rssItem的原始信息
+  updatedAt       DateTime  @updatedAt // 更新时间戳，系统自动生成
+  createdAt       DateTime  @default(now()) // 创建时间，系统自动生成
 
   // 关联关系字段
   rssSource    RssSource     @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系

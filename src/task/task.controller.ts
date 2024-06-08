@@ -7,7 +7,12 @@ export class TaskController {
 	constructor(private readonly rssService: RssService) {}
 	@Post()
 	create(@Body() createItemDto: CreateItemDto) {
-		const { rssSourceID } = createItemDto;
-		return this.rssService.updateItemByRssSourceID(rssSourceID);
+		const { rssSourceID, taskType } = createItemDto;
+		switch (taskType) {
+			case "UPDATE_ITEM":
+				return this.rssService.updateItemByRssSourceID(rssSourceID);
+			default:
+				return "暂不支持的任务类型";
+		}
 	}
 }

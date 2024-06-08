@@ -44,6 +44,7 @@ export const ErrorCode = {
 	RSS_PARSER_ERROR: "RSS_PARSER_ERROR",
 	RSS_FETCH_ERROR: "RSS_FETCH_ERROR",
 	RSS_INVALID_URL: "RSS_INVALID_URL",
+  RSS_UPDATA_ITEM: "RSS_UPDATA_ITEM",
 
 	// 自定义模块相关错误（可扩展）
 	// ExampleModule
