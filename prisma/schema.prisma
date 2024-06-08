@@ -7,39 +7,46 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// RssSource 模型：存储 RSS 源的基本信息
 model RssSource {
-  id          Int      @id @default(autoincrement()) // 主键，自增
-  sourceUrl   String   // 文章来源 URL，不再是唯一
-  sourceTitle String   // 文章来源标题
-  rssID       String   @unique// RSS ID,用于生成rss源,以及作为唯一索引.
-  customName  String?  // 用户自定义名称
-  createdAt   DateTime @default(now()) // 创建时间，默认为当前时间
-  updatedAt   DateTime @updatedAt // 更新时间戳
+  id            Int      @id @default(autoincrement()) // 主键，自增
+  sourceUrl     String // 文章来源 URL
+  rssID         String   @unique // RSS ID, 用于生成 RSS 源，并作为唯一索引
+  customName    String? // 用户自定义名称
+  rssOriginInfo String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
+  createdAt     DateTime @default(now()) // 创建时间，默认为当前时间
+  updatedAt     DateTime @updatedAt // 更新时间戳
 
   // 关系字段
-  articles Article[] // 与 Article 表的关系 (一对多)
+  rssItems RssItem[] // 与 RssItem 表的关系 (一对多)
 }
 
-model Article {
-  id                Int       @id @default(autoincrement()) // 主键，自增
-  rssSourceId       Int       // 关联的 RSS 源 ID，指向 RssSource 表的主键
-  articleId         String?   // 文章 ID，rss订阅源自动生成，在特定的url下是唯一
-  articleGuid       String?   // 文章 guid，rss订阅源自动生成，在特定的url下是唯一
-  articleUrl        String    // 文章 URL
-  title             String    // 文章标题
-  content           String?   // 文章内容
-  translatedContent String?   // 翻译后的文章内容
-  summary           String?   // 文章摘要
-  translatedSummary String?   // 翻译后的文章摘要
-  contentAudio      String?   // 内容的音频
-  summaryAudio      String?   // 摘要的音频
-  translatedAudio   String?   // 翻译后摘要的音频
-  status            String    @default("NOT_STARTED") // 处理状态，默认为 "NOT_STARTED"
-  errorMessage      String?   // 错误消息
-  updated           DateTime? // 更新时间,rss信息提供的文章更新时间
-  updatedAt         DateTime  @updatedAt // 更新时间戳,系统自动生成
-  createdAt         DateTime  @default(now()) // 创建时间，系统自动生成
-  
+// RssItem 模型：存储每个 RSS 条目的详细信息
+model RssItem {
+  id          Int       @id @default(autoincrement()) // 主键，自增
+  rssSourceId Int // 关联的 RSS 源 ID，指向 RssSource 表的主键
+  articleId   String? // 文章 ID，RSS 订阅源自动生成，在特定的 URL 下是唯一的
+  articleGuid String? // 文章 GUID，RSS 订阅源自动生成，在特定的 URL 下是唯一的
+  articleUrl  String // 文章 URL
+  title       String? // 文章标题
+  content     String? // 文章内容
+  status      String? // 处理状态
+  updated     DateTime? // 更新时间，RSS 信息提供的文章更新时间
+  updatedAt   DateTime  @updatedAt // 更新时间戳，系统自动生成
+  createdAt   DateTime  @default(now()) // 创建时间，系统自动生成
+
   // 关联关系字段
-  rssSource         RssSource @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
+  rssSource    RssSource     @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
+  translations Translation[] // 与 Translation 表的关系 (一对多)
+}
+
+// Translation 模型：存储每个 RSS 条目的翻译内容
+model Translation {
+  id        Int      @id @default(autoincrement()) // 主键，自增
+  rssItemId Int // 关联的 RSS 条目 ID，指向 RssItem 表的主键
+  language  String // 翻译的目标语言
+  title     String? // 翻译的标题
+  content   String? // 翻译的内容
+  createdAt DateTime @default(now()) // 翻译的创建时间
+  rssItem   RssItem  @relation(fields: [rssItemId], references: [id]) // 与 RssItem 表的关系
 }
