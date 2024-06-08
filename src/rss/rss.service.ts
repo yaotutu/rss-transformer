@@ -42,6 +42,10 @@ export class RssService {
 		}
 	}
 
+	generateItemByRssSourceID(id: number) {
+		return `${id} 任务进行中`;
+	}
+
 	update(id: number, _updateRssDto: UpdateRssDto) {
 		return `This action updates a #${id} rss`;
 	}
@@ -52,9 +56,9 @@ export class RssService {
 
 	async initializeRssSources(url) {
 		const feed = await this.parser.parseURL(url);
-		const { } = feed;
+		const {} = feed;
 		feed.items = undefined;
-    const rssOriginInfo = JSON.stringify(feed);
+		const rssOriginInfo = JSON.stringify(feed);
 		this.rssPrismaService.updateRssSource(2, { rssOriginInfo });
 	}
 

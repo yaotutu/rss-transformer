@@ -1,5 +1,5 @@
 // prisma.service.ts
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { PrismaClient, RssSource } from "@prisma/client";
 import { WinstonService } from "../logger/winston.service";
 import { ApiResponse } from "../dto/common.dto";
@@ -20,6 +20,45 @@ export class RssPrismaService {
 		this.prisma = new PrismaClient();
 	}
 
+	/**
+	 * Handles Prisma errors.
+	 * @param {any} error - The error object.
+	 * @param {string} message - The error message.
+	 */
+	private handlePrismaError(error: any, message: string): void {
+		console.error(message, error);
+		if (error instanceof Error) {
+			throw new InternalServerErrorException(message);
+		} else {
+			throw new InternalServerErrorException("Database error occurred.");
+		}
+	}
+
+	/**
+	 * Retrieves an RSS source by its ID.
+	 * @param {number} rssSourceId - The ID of the RSS source.
+	 * @returns {Promise<RssSource>} - The retrieved RSS source.
+	 */
+	async getRssSourceById(rssSourceId: number): Promise<RssSource> {
+		try {
+			const rssSource = await this.prisma.rssSource.findUnique({
+				where: { id: rssSourceId },
+			});
+
+			if (!rssSource) {
+				throw new NotFoundException(
+					`RSS Source with ID ${rssSourceId} not found.`,
+				);
+			}
+
+			return rssSource;
+		} catch (error) {
+			this.handlePrismaError(
+				error,
+				`Failed to retrieve RSS source with ID ${rssSourceId}.`,
+			);
+		}
+	}
 	/**
 	 * Creates a new RSS source.
 	 * @param {Object} sourceInfo - The information of the RSS source to be created.

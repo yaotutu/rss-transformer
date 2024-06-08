@@ -20,12 +20,14 @@ export class RssController {
 		return this.rssService.create(createRssDto);
 	}
 
+
 	@Get()
 	findAll() {
-    return this.rssService.initializeRssSources("https://feeds.appinn.com/appinns/")
-    return this.rssService.getAllRssSources()
+		return this.rssService.initializeRssSources(
+			"https://feeds.appinn.com/appinns/",
+		);
+		return this.rssService.getAllRssSources();
 	}
-
 
 	@Patch(":id")
 	update(@Param("id") id: string, @Body() updateRssDto: UpdateRssDto) {
