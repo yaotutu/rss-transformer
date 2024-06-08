@@ -6,7 +6,6 @@ import {
 	Patch,
 	Param,
 	Delete,
-	Query,
 } from "@nestjs/common";
 import { RssService } from "./rss.service";
 import { CreateRssDto } from "./dto/create-rss.dto";
@@ -23,6 +22,7 @@ export class RssController {
 
 	@Get()
 	findAll() {
+    return this.rssService.initializeRssSources("https://feeds.appinn.com/appinns/")
     return this.rssService.getAllRssSources()
 	}
 

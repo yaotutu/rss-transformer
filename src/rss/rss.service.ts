@@ -15,7 +15,7 @@ export class RssService {
 	private parser: Parser<any, any>;
 	constructor(
 		private winstonService: WinstonService,
-		private prisma: RssPrismaService,
+		private rssPrismaService: RssPrismaService,
 	) {
 		this.parser = new Parser({
 			headers: { Accept: "application/rss+xml, text/xml; q=0.1" },
@@ -23,20 +23,16 @@ export class RssService {
 	}
 
 	getAllRssSources() {
-		return this.prisma.getAllRssSources();
-		// return await this.RssPrismaService.rssSource.findMany();
+		return this.rssPrismaService.getAllRssSources();
 	}
 
-	async create(_createRssDto: CreateRssDto) {
-		const { sourceUrl, rssID } = _createRssDto;
-		let title = "";
+	create(_createRssDto: CreateRssDto) {
+		const { sourceUrl, rssID, customName } = _createRssDto;
 		try {
-			const feed = await this.fetchRssData(sourceUrl);
-			title = feed.title;
-			return await this.prisma.createRssSource({
+			return this.rssPrismaService.createRssSource({
 				rssID: rssID,
 				sourceUrl: sourceUrl,
-				sourceTitle: title,
+				customName: customName,
 			});
 		} catch (error) {
 			this.winstonService.error("ADD_RSS_SOURCE", "添加RSS源时出错", error);
@@ -52,6 +48,14 @@ export class RssService {
 
 	remove(id: number) {
 		return `This action removes a #${id} rss`;
+	}
+
+	async initializeRssSources(url) {
+		const feed = await this.parser.parseURL(url);
+		const { } = feed;
+		feed.items = undefined;
+    const rssOriginInfo = JSON.stringify(feed);
+		this.rssPrismaService.updateRssSource(2, { rssOriginInfo });
 	}
 
 	async fetchRssData(url: string) {
