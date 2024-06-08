@@ -42,7 +42,7 @@ export class RssService {
 		}
 	}
 
-	generateItemByRssSourceID(id: number) {
+	updateItemByRssSourceID(id: number) {
 		return `${id} 任务进行中`;
 	}
 
@@ -52,14 +52,6 @@ export class RssService {
 
 	remove(id: number) {
 		return `This action removes a #${id} rss`;
-	}
-
-	async initializeRssSources(url) {
-		const feed = await this.parser.parseURL(url);
-		const {} = feed;
-		feed.items = undefined;
-		const rssOriginInfo = JSON.stringify(feed);
-		this.rssPrismaService.updateRssSource(2, { rssOriginInfo });
 	}
 
 	async fetchRssData(url: string) {

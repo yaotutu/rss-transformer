@@ -8,5 +8,6 @@ import { CommonModule } from "src/common/common.module";
 	imports: [CommonModule],
 	controllers: [RssController],
 	providers: [RssService],
+  exports: [RssService]
 })
 export class RssModule {}

@@ -7,9 +7,10 @@ import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 import { CommonModule } from "./common/common.module";
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { TaskModule } from './task/task.module';
 
 @Module({
-	imports: [RssModule, CoreRssProcessorModule, CommonModule],
+	imports: [RssModule, CoreRssProcessorModule, CommonModule, TaskModule],
 	controllers: [AppController],
 	providers: [
 		AppService,
