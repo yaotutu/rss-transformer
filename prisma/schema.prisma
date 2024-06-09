@@ -14,6 +14,8 @@ model RssSource {
   rssID         String   @unique // RSS ID, 用于生成 RSS 源，并作为唯一索引
   customName    String? // 用户自定义名称
   rssOriginInfo String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
+  taskType      String? // 任务类型
+  taskStatus    String? // 任务状态
   createdAt     DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt     DateTime @updatedAt // 更新时间戳
 
