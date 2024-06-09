@@ -1,24 +1,21 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleInit,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit, NotFoundException } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Task } from '@prisma/client';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { TaskPrismaService } from '../common/prisma/task-prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { WinstonService } from '../common/logger/winston.service'; // WinstonService 的路径
+import { ApiException } from 'src/common/dto/common.dto';
 
 @Injectable()
 export class TaskService implements OnModuleInit {
-  private readonly logger = new Logger(TaskService.name);
   private currentTasks = new Map<number, string>();
 
   constructor(
     private taskPrismaService: TaskPrismaService,
     private schedulerRegistry: SchedulerRegistry,
+    private winstonService: WinstonService, // 注入 WinstonService
   ) {}
 
   async onModuleInit() {
@@ -29,14 +26,16 @@ export class TaskService implements OnModuleInit {
     }
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto): Promise<Task | string> {
     const { name, schedule, taskType, functionName, taskData, rssSourceId } =
       createTaskDto;
+    console.log('createTaskDto', createTaskDto);
+    return 'createTaskDto';
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
       if (existingTask) {
-        throw new Error(`Task with name '${name}' already exists.`);
+        throw new ApiException(400, `Task with name '${name}' already exists.`);
       }
 
       const task = await this.taskPrismaService.createTask(
@@ -56,7 +55,7 @@ export class TaskService implements OnModuleInit {
 
   async sayHello(): Promise<string> {
     const message = 'Hello, World!';
-    this.logger.log(message);
+    this.winstonService.info('TASK', message); // 记录信息日志
     return message;
   }
 
@@ -78,7 +77,7 @@ export class TaskService implements OnModuleInit {
         if (!tasks.some((task) => task.id === taskId)) {
           if (this.schedulerRegistry.doesExist('cron', jobName)) {
             this.schedulerRegistry.deleteCronJob(jobName);
-            this.logger.warn(`Removed job ${jobName}`);
+            this.winstonService.warn('TASK', `Removed job ${jobName}`); // 记录警告日志
           }
           this.currentTasks.delete(taskId);
         }
@@ -100,22 +99,28 @@ export class TaskService implements OnModuleInit {
 
     // 检查是否存在相同名称的 Cron Job
     if (this.schedulerRegistry.doesExist('cron', jobName)) {
-      this.logger.warn(`Job ${jobName} already exists, skipping addition.`);
+      this.winstonService.warn(
+        'TASK',
+        `Job ${jobName} already exists, skipping addition.`,
+      ); // 记录警告日志
       return;
     }
 
     const jobCallback = async () => {
-      this.logger.debug(`Running task: ${task.name}`);
+      this.winstonService.debug('TASK', `Running task: ${task.name}`); // 记录调试日志
       const data = JSON.parse(task.taskData);
       const method = (this as any)[task.functionName];
       if (typeof method === 'function') {
         try {
           await method.call(this, data);
         } catch (error) {
-          this.handleError(`Failed to execute task: ${task.name}`, error);
+          this.handleError('Failed to execute task', error);
         }
       } else {
-        this.logger.error(`Unknown function: ${task.functionName}`);
+        this.winstonService.error(
+          'TASK',
+          `Unknown function: ${task.functionName}`,
+        ); // 记录错误日志
       }
     };
 
@@ -130,11 +135,25 @@ export class TaskService implements OnModuleInit {
     this.schedulerRegistry.addCronJob(jobName, cronJob);
     cronJob.start();
     this.currentTasks.set(task.id, jobName);
-    this.logger.warn(`Job ${jobName} added with schedule ${task.schedule}`);
+    this.winstonService.info(
+      'TASK',
+      `Job ${jobName} added with schedule ${task.schedule}`,
+    ); // 记录信息日志
   }
 
   private handleError(message: string, error: any) {
-    this.logger.error(message, error);
-    throw new Error(message);
+    if (error instanceof ApiException) {
+      // Already an ApiException, no need to wrap
+      this.winstonService.error('TASK', message, error); // 记录错误日志
+      throw error;
+    }
+
+    if (error instanceof Error) {
+      this.winstonService.error('TASK', message, error); // 记录错误日志
+    } else {
+      this.winstonService.error('TASK', message, error.toString()); // 记录错误日志
+    }
+
+    throw new ApiException(500, message);
   }
 }

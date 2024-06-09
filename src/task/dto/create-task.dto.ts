@@ -1,6 +1,7 @@
 import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty } from 'class-validator';
+import { IsIn, IsNotEmpty, Validate } from 'class-validator';
+import { IsCronExpression } from './is-cron-expression.validator';
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -14,6 +15,7 @@ export class CreateTaskDto {
     description: '定时任务的调度规则，cron 表达式或类似格式',
     example: '*/10 * * * * *',
   })
+  @Validate(IsCronExpression) // 使用自定义校验器
   @IsNotEmpty()
   readonly schedule: string;
 

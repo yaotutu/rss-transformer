@@ -4,6 +4,7 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { WinstonService } from './logger/winston.service';
 import { RssPrismaService } from './prisma/rss-prisma.service';
 import { TaskPrismaService } from './prisma/task-prisma.service';
+import { ValidationPipe } from './pipe/validation.pipe';
 
 @Module({
   providers: [
