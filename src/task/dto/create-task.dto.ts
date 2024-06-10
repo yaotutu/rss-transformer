@@ -49,4 +49,11 @@ export class CreateTaskDto {
   })
   @IsNotEmpty()
   readonly rssSourceId: number;
+
+  @ApiProperty({
+    description: '是否立即执行任务',
+    example: false,
+  })
+  @Optional()
+  readonly immediate?: boolean;
 }
