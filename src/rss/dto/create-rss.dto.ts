@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateRssDto {
   @ApiProperty({
@@ -13,7 +19,7 @@ export class CreateRssDto {
     description: 'rss唯一id,用于生成每一条rss订阅源',
     example: '1234',
   })
-  @IsString()
+  @IsNumber()
   readonly id: number;
 
   @ApiPropertyOptional({

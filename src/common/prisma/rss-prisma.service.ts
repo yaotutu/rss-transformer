@@ -1,42 +1,24 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaClient, RssSource, RssItem } from '@prisma/client';
-import { ErrorCode } from 'src/types';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { RssSource, RssItem } from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
 import { ApiResponse } from '../dto/common.dto';
+import { BasePrismaService } from './base-prisma.service';
+import { ErrorHandlingService } from '../error-handling/error-handling.service';
 
 /**
  * Service for interacting with Prisma client to manage RSS sources and items.
  */
 @Injectable()
-export class RssPrismaService {
-  private readonly prisma: PrismaClient;
-
-  /**
-   * Initializes the Prisma client and injects the WinstonService.
-   * @param {WinstonService} winstonService - The Winston logging service.
-   */
-  constructor(private winstonService: WinstonService) {
-    this.prisma = new PrismaClient();
-  }
-
-  /**
-   * Handles Prisma errors and logs them.
-   * @param {any} error - The error object.
-   * @param {string} message - The error message.
-   */
-  private handlePrismaError(error: any, message: string): void {
-    this.winstonService.error('DATABASE', message, error); // Log the error using WinstonService
-    console.error(message, error);
-    throw new InternalServerErrorException(message);
+export class RssPrismaService extends BasePrismaService {
+  constructor(
+    protected winstonService: WinstonService,
+    protected errorHandlingService: ErrorHandlingService,
+  ) {
+    super(winstonService, errorHandlingService);
   }
 
   /**
    * Retrieves an RSS source by its ID.
-   * 通过id查询rss源在数据库中的信息
    * @param {number} rssSourceId - The ID of the RSS source.
    * @returns {Promise<RssSource>} - The retrieved RSS source.
    */
@@ -55,8 +37,9 @@ export class RssPrismaService {
       return rssSource;
     } catch (error) {
       this.handlePrismaError(
-        error,
+        'DATABASE',
         `Failed to retrieve RSS source with ID ${rssSourceId}.`,
+        error,
       );
     }
   }
@@ -82,27 +65,16 @@ export class RssPrismaService {
     });
 
     if (existingRssSource) {
-      return new ApiResponse(
-        409,
-        'Conflict',
-        null,
-        ErrorCode.RSS_SOURCE_EXISTS,
-      );
+      this.handlePrismaError('DATABASE', 'RSS source already exists.', null);
     }
 
     // Create a new RSS source
     try {
-      const data = {
-        id,
-        sourceUrl,
-        customName,
-      };
-      const res = await this.prisma.rssSource.create({
-        data,
-      });
+      const data = { id, sourceUrl, customName };
+      const res = await this.prisma.rssSource.create({ data });
       return res;
     } catch (error) {
-      this.handlePrismaError(error, 'Failed to create RSS source.');
+      this.handlePrismaError('DATABASE', 'Failed to create RSS source.', error);
     }
   }
 
@@ -114,7 +86,11 @@ export class RssPrismaService {
     try {
       return await this.prisma.rssSource.findMany();
     } catch (error) {
-      this.handlePrismaError(error, 'Failed to fetch all RSS sources.');
+      this.handlePrismaError(
+        'DATABASE',
+        'Failed to fetch all RSS sources.',
+        error,
+      );
     }
   }
 
@@ -135,15 +111,10 @@ export class RssPrismaService {
       });
 
       if (!existingRssSource) {
-        return new ApiResponse(
-          404,
-          'Not Found',
-          null,
-          ErrorCode.RSS_SOURCE_NOT_FOUND,
-        );
+        this.handlePrismaError('DATABASE', 'RSS source not found.', null);
       }
 
-      // Perform the update
+      // Update the RSS source
       const updatedRssSource = await this.prisma.rssSource.update({
         where: { id },
         data: updateFields,
@@ -151,14 +122,15 @@ export class RssPrismaService {
 
       return updatedRssSource;
     } catch (error) {
-      this.handlePrismaError(error, 'Failed to update RSS source.');
+      this.handlePrismaError('DATABASE', 'Failed to update RSS source.', error);
     }
   }
+
   /**
-   * Creates multiple RSS items in the database.
+   * Creates RSS items for a given RSS source.
    * @param {number} rssSourceId - The ID of the RSS source.
-   * @param {Omit<RssItem, "id">[]} items - The list of RSS items to create.
-   * @returns {Promise<{ createdCount: number, skippedCount: number }>} - Counts of created and skipped items.
+   * @param {Omit<RssItem, 'id'>[]} items - The items to create.
+   * @returns {Promise<{ createdCount: number; skippedCount: number }>} - The counts of created and skipped items.
    */
   async createRssItems(
     rssSourceId: number,
@@ -187,12 +159,9 @@ export class RssPrismaService {
 
       for (const item of newItems) {
         try {
-          await this.prisma.rssItem.create({
-            data: item,
-          });
+          await this.prisma.rssItem.create({ data: item });
           createdCount++;
         } catch (error) {
-          // Log the error and continue
           this.winstonService.error(
             'DATABASE',
             `Failed to create RSS item: ${JSON.stringify(item)}`,
@@ -202,12 +171,9 @@ export class RssPrismaService {
         }
       }
 
-      return {
-        createdCount,
-        skippedCount,
-      };
+      return { createdCount, skippedCount };
     } catch (error) {
-      this.handlePrismaError(error, 'Failed to create RSS items.');
+      this.handlePrismaError('DATABASE', 'Failed to create RSS items.', error);
       throw new Error('Failed to create RSS items.');
     }
   }

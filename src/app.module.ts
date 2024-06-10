@@ -10,7 +10,6 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskService } from './task/task.service';
-import { ValidationPipe } from './common/pipe/validation.pipe';
 
 @Module({
   imports: [
@@ -24,10 +23,6 @@ import { ValidationPipe } from './common/pipe/validation.pipe';
   providers: [
     AppService,
     TaskService,
-    // {
-    //   provide: APP_PIPE,
-    //   useClass: ValidationPipe,
-    // },
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
