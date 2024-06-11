@@ -27,10 +27,9 @@ export class RssService {
   }
 
   create(_createRssDto: CreateRssDto) {
-    const { sourceUrl, id, customName } = _createRssDto;
+    const { sourceUrl, customName } = _createRssDto;
     try {
       return this.rssPrismaService.createRssSource({
-        id: id,
         sourceUrl: sourceUrl,
         customName: customName,
       });
