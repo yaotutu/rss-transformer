@@ -23,6 +23,9 @@
     "migrate-and-generate": "npm run migrate -- && npm run generate"
   },
   "dependencies": {
+    "@langchain/community": "^0.2.9",
+    "@langchain/core": "^0.2.6",
+    "@langchain/openai": "^0.1.2",
     "@nestjs/common": "^10.3.9",
     "@nestjs/core": "^10.3.9",
     "@nestjs/platform-express": "^10.3.9",
@@ -32,6 +35,8 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cron": "^3.1.7",
+    "langchain": "^0.2.5",
+    "prompts": "link:@langchain/core/prompts",
     "reflect-metadata": "^0.2.2",
     "rss-parser": "^3.13.0",
     "rxjs": "^7.8.1",

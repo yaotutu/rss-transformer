@@ -54,14 +54,13 @@ export class RssPrismaService extends BasePrismaService {
    */
   async createRssSource(sourceInfo: {
     sourceUrl: string;
-    id: number;
     customName: string;
-  }): Promise<RssSource | ApiResponse<string>> {
-    const { sourceUrl, id, customName } = sourceInfo;
+  }): Promise<RssSource> {
+    const { sourceUrl, customName } = sourceInfo;
 
     // Check if the RSS source already exists
     const existingRssSource = await this.prisma.rssSource.findUnique({
-      where: { id },
+      where: { sourceUrl },
     });
 
     if (existingRssSource) {
@@ -70,7 +69,7 @@ export class RssPrismaService extends BasePrismaService {
 
     // Create a new RSS source
     try {
-      const data = { id, sourceUrl, customName };
+      const data = { sourceUrl, customName };
       const res = await this.prisma.rssSource.create({ data });
       return res;
     } catch (error) {

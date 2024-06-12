@@ -5,6 +5,7 @@ import { WinstonService } from './logger/winston.service';
 import { RssPrismaService } from './prisma/rss-prisma.service';
 import { TaskPrismaService } from './prisma/task-prisma.service';
 import { ErrorHandlingService } from './error-handling/error-handling.service';
+import { LangchainService } from './langchain/langchain.service';
 
 @Module({
   providers: [
@@ -13,6 +14,7 @@ import { ErrorHandlingService } from './error-handling/error-handling.service';
     RssPrismaService,
     TaskPrismaService,
     ErrorHandlingService,
+    LangchainService,
   ],
   exports: [
     ResponseInterceptor,
@@ -20,6 +22,7 @@ import { ErrorHandlingService } from './error-handling/error-handling.service';
     RssPrismaService,
     TaskPrismaService,
     ErrorHandlingService,
+    LangchainService,
   ],
 })
 export class CommonModule {}
