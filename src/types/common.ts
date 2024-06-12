@@ -28,3 +28,7 @@ export type taskStatus =
   | 'FAILED'
   | 'IN_PROGRESS'
   | 'NOT_STARTED';
+
+export interface Task {
+  execute(data: any): Promise<void>;
+}

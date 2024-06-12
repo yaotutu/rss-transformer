@@ -16,7 +16,7 @@ export class TaskController {
 
   @Post('hello')
   async sayHello() {
-    return await this.taskService.sayHello();
+    // return await this.taskService.sayHello();
   }
 
   @Get()

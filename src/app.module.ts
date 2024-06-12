@@ -9,7 +9,6 @@ import { CommonModule } from './common/common.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TaskService } from './task/task.service';
 
 @Module({
   imports: [
@@ -22,7 +21,6 @@ import { TaskService } from './task/task.service';
   controllers: [AppController],
   providers: [
     AppService,
-    TaskService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,

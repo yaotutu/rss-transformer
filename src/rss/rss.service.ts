@@ -26,13 +26,14 @@ export class RssService {
     return this.rssPrismaService.getAllRssSources();
   }
 
-  create(_createRssDto: CreateRssDto) {
+  async create(_createRssDto: CreateRssDto) {
     const { sourceUrl, customName } = _createRssDto;
     try {
-      return this.rssPrismaService.createRssSource({
+      const rssSourceItem = await this.rssPrismaService.createRssSource({
         sourceUrl: sourceUrl,
         customName: customName,
       });
+      return await this.updateItemByRssSourceID(rssSourceItem.id);
     } catch (error) {
       this.winstonService.error('ADD_RSS_SOURCE', '添加RSS源时出错', error);
       throw new ServiceUnavailableException(
@@ -53,13 +54,6 @@ export class RssService {
     return hash.digest('hex');
   }
 
-  // async updateItemByRssSourceID(id: number) {
-  //    const rssSource = await this.rssPrismaService.getRssSourceById(id);
-  //
-  //    const feed = await this.fetchRssData(rssSource.sourceUrl);
-  //    const items = feed.items;
-  // 	return `${JSON.stringify(feed)} 任务进行中`;
-  // }
   /**
    * Updates RSS items by RSS source ID.
    * @param {number} id - The ID of the RSS source.
@@ -68,7 +62,6 @@ export class RssService {
   async updateItemByRssSourceID(id: number): Promise<string> {
     try {
       const rssSource = await this.rssPrismaService.getRssSourceById(id);
-
       const feed = await this.fetchRssData(rssSource.sourceUrl);
       const items = feed.items.map((item) => ({
         rssSourceId: id,
