@@ -176,4 +176,30 @@ export class RssPrismaService extends BasePrismaService {
       throw new Error('Failed to create RSS items.');
     }
   }
+  /**
+   * Retrieves all RSS items for a given RSS source by its ID.
+   * @param {number} rssSourceId - The ID of the RSS source.
+   * @returns {Promise<RssItem[]>} - The list of RSS items.
+   */
+  async getAllItemsByRssSourceId(rssSourceId: number): Promise<RssItem[]> {
+    try {
+      const rssItems = await this.prisma.rssItem.findMany({
+        where: { rssSourceId },
+      });
+
+      if (!rssItems.length) {
+        throw new NotFoundException(
+          `No RSS items found for RSS Source with ID ${rssSourceId}.`,
+        );
+      }
+
+      return rssItems;
+    } catch (error) {
+      this.handlePrismaError(
+        'DATABASE',
+        `Failed to retrieve RSS items for source with ID ${rssSourceId}.`,
+        error,
+      );
+    }
+  }
 }

@@ -30,5 +30,5 @@ export type taskStatus =
   | 'NOT_STARTED';
 
 export interface Task {
-  execute(data: any): Promise<void>;
+  execute(data: any, rssSourceId: number): Promise<void>;
 }
