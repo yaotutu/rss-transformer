@@ -1,17 +1,18 @@
 // src/common/prisma/task-prisma.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { BasePrismaService } from './base-prisma.service';
-import { Task as DbTask, RssItem } from '@prisma/client';
+import { Task as DbTask, PrismaClient, RssItem } from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
 import { ErrorHandlingService } from '../error-handling/error-handling.service';
 
 @Injectable()
 export class TaskPrismaService extends BasePrismaService {
   constructor(
+    prisma: PrismaClient,
     winstonService: WinstonService,
     errorHandlingService: ErrorHandlingService,
   ) {
-    super(winstonService, errorHandlingService);
+    super(prisma, winstonService, errorHandlingService);
   }
 
   async createTask(

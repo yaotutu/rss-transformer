@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RssSource, RssItem } from '@prisma/client';
+import { RssSource, RssItem, PrismaClient } from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
 import { ApiResponse } from '../dto/common.dto';
 import { BasePrismaService } from './base-prisma.service';
@@ -11,10 +11,11 @@ import { ErrorHandlingService } from '../error-handling/error-handling.service';
 @Injectable()
 export class RssPrismaService extends BasePrismaService {
   constructor(
+    prisma: PrismaClient,
     protected winstonService: WinstonService,
     protected errorHandlingService: ErrorHandlingService,
   ) {
-    super(winstonService, errorHandlingService);
+    super(prisma, winstonService, errorHandlingService);
   }
 
   /**

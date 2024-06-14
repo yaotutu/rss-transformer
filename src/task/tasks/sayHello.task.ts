@@ -9,8 +9,9 @@ export class SayHelloTask implements Task {
 
   async execute(data: any, rssSourceId: number): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
+      const str = JSON.stringify(data);
       try {
-        console.log(`Hello, ${data.param1}!`);
+        console.log(`Hello, ${str}!`);
         if (data.param2) {
           console.log(`You have provided param2: ${data.param2}`);
         }
