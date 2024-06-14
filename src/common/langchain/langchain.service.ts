@@ -8,11 +8,12 @@ export class LangchainService {
 
   constructor() {
     this.model = new ChatOpenAI({
-      azureOpenAIApiKey: '', // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
-      azureOpenAIApiInstanceName: 'yao2', // In Node.js defaults to process.env.AZURE_OPENAI_API_INSTANCE_NAME
-      azureOpenAIApiEmbeddingsDeploymentName: 'text-emb-3', // In Node.js defaults to process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME
-      azureOpenAIApiVersion: '2024-02-15-preview', // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
-      azureOpenAIApiDeploymentName: 'gpt35',
+      azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
+      azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
+      azureOpenAIApiEmbeddingsDeploymentName:
+        process.env.AZURE_OPENAI_API_EMBEDDING_DEPLOYMENT_NAME,
+      azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
+      azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
     });
   }
 
