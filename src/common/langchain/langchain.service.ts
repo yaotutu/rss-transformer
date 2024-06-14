@@ -1,20 +1,16 @@
+// src/services/langchain.service.ts
+
 import { Injectable } from '@nestjs/common';
-import { AzureOpenAIEmbeddings, ChatOpenAI, OpenAI } from '@langchain/openai';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { ChatOpenAI } from '@langchain/openai';
+import { ModelFactory } from './model-factory';
 
 @Injectable()
 export class LangchainService {
   private model: ChatOpenAI;
 
-  constructor() {
-    this.model = new ChatOpenAI({
-      azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
-      azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
-      azureOpenAIApiEmbeddingsDeploymentName:
-        process.env.AZURE_OPENAI_API_EMBEDDING_DEPLOYMENT_NAME,
-      azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
-      azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
-    });
+  constructor(private modelFactory: ModelFactory) {
+    this.model = this.modelFactory.getModel('OpenAI'); // 默认使用 OpenAI 模型
   }
 
   async getTest(): Promise<any> {
@@ -30,13 +26,17 @@ export class LangchainService {
     try {
       const res = await chain.invoke({
         input: `
-        
+          {
+            "field1": "This is some text that needs to be translated",
+            "field2": "And also this text"
+          }
         `,
       });
       console.log({ res });
       return res;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error;
     }
   }
 }

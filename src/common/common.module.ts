@@ -7,6 +7,9 @@ import { TaskPrismaService } from './prisma/task-prisma.service';
 import { ErrorHandlingService } from './error-handling/error-handling.service';
 import { LangchainService } from './langchain/langchain.service';
 import { PrismaClient } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import { ModelFactory } from './langchain/model-factory';
+import { ModelConfigService } from './config/model-config.service';
 
 @Module({
   providers: [
@@ -17,6 +20,9 @@ import { PrismaClient } from '@prisma/client';
     TaskPrismaService,
     ErrorHandlingService,
     LangchainService,
+    ConfigService,
+    ModelFactory,
+    ModelConfigService,
   ],
   exports: [
     ResponseInterceptor,
@@ -26,6 +32,9 @@ import { PrismaClient } from '@prisma/client';
     TaskPrismaService,
     ErrorHandlingService,
     LangchainService,
+    ConfigService,
+    ModelFactory,
+    ModelConfigService,
   ],
 })
 export class CommonModule {}

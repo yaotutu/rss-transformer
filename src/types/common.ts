@@ -18,7 +18,9 @@ export type LogType =
   | 'DATABASE'
   | 'GENERAL'
   | 'ADD_RSS_SOURCE'
-  | 'UPDATE_RSS_ITEMS';
+  | 'UPDATE_RSS_ITEMS'
+  | 'MODEL_FACTORY'
+  | 'MODEL_CONFIG';
 
 export type tsakType = 'TRANSLATE' | 'UPDATE_RSS_ITEMS';
 

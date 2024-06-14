@@ -27,6 +27,7 @@
     "@langchain/core": "^0.2.6",
     "@langchain/openai": "^0.1.2",
     "@nestjs/common": "^10.3.9",
+    "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.3.9",
     "@nestjs/platform-express": "^10.3.9",
     "@nestjs/schedule": "^4.0.2",
