@@ -4,6 +4,7 @@ export class ApiResponse<T> {
     public message: string,
     public data: T | null,
     public error?: string,
+    public meta?: { isRss?: boolean }, // 添加 meta 字段，用于存储额外的元数据
   ) {}
 }
 

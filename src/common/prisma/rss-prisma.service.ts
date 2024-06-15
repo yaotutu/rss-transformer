@@ -6,7 +6,7 @@ import {
   RssTransformed,
 } from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
-import { ApiResponse } from '../dto/common.dto';
+import { ApiException, ApiResponse } from '../dto/common.dto';
 import { BasePrismaService } from './base-prisma.service';
 import { ErrorHandlingService } from '../error-handling/error-handling.service';
 
@@ -124,7 +124,10 @@ export class RssPrismaService extends BasePrismaService {
         where: { id },
         data: updateFields,
       });
-
+      this.winstonService.info(
+        'DATABASE',
+        `RSS source updated successfully for source ID ${id}.`,
+      );
       return updatedRssSource;
     } catch (error) {
       this.handlePrismaError('DATABASE', 'Failed to update RSS source.', error);
@@ -300,5 +303,56 @@ export class RssPrismaService extends BasePrismaService {
     }
 
     return successMessages;
+  }
+  /**
+   * Retrieves all transformed RSS items for a given task ID, and includes the RSS origin info.
+   * @param {number} taskId - The ID of the task.
+   * @returns {Promise<object>} - A JSON object containing rssOriginInfo and items.
+   */
+  async getTransformedRss(taskId: number): Promise<any> {
+    try {
+      // 尝试获取 taskId 关联的任务信息
+      const task = await this.prisma.task.findUnique({
+        where: { id: taskId },
+      });
+
+      if (!task) {
+        throw new NotFoundException(`No Task found for task ID ${taskId}.`);
+      }
+
+      const rssSourceId = task.rssSourceId;
+
+      const rssSource = await this.prisma.rssSource.findUnique({
+        where: { id: rssSourceId },
+      });
+
+      if (!rssSource) {
+        throw new NotFoundException(
+          `No RssSource found for rssSourceId ${rssSourceId}.`,
+        );
+      }
+
+      // 获取所有与 taskId 相关的 RssTransformed 数据
+      const rssTransformedItems = await this.prisma.rssTransformed.findMany({
+        where: { taskId },
+      });
+
+      // 构建返回的 JSON 对象
+      const result = {
+        ...JSON.parse(rssSource.rssOriginInfo || '{}'),
+        items: rssTransformedItems.map((item) =>
+          JSON.parse(item.itemTransformedInfo || '{}'),
+        ),
+      };
+
+      return result;
+    } catch (error) {
+      this.handlePrismaError(
+        'DATABASE',
+        `Failed to retrieve RssTransformed items with origin info for task ID ${taskId}.`,
+        error,
+      );
+      throw error;
+    }
   }
 }

@@ -9,6 +9,7 @@ import { CommonModule } from './common/common.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TransformeredModule } from './transformered/transformered.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CommonModule,
     TaskModule,
     ScheduleModule.forRoot(),
+    TransformeredModule,
   ],
   controllers: [AppController],
   providers: [

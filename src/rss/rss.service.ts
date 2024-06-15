@@ -19,6 +19,9 @@ export class RssService {
   ) {
     this.parser = new Parser({
       headers: { Accept: 'application/rss+xml, text/xml; q=0.1' },
+      xml2js: {
+        explicitArray: false, // Ensure that repeated elements are not overwritten
+      },
     });
   }
 
@@ -63,6 +66,8 @@ export class RssService {
     try {
       const rssSource = await this.rssPrismaService.getRssSourceById(id);
       const feed = await this.fetchRssData(rssSource.sourceUrl);
+      // return;
+      this.updateSourceOriginInfo(id, feed);
       const items = feed.items.map((item) => ({
         rssSourceId: id,
         itemUrl: item.link,
@@ -96,6 +101,15 @@ export class RssService {
         error,
       );
     }
+  }
+
+  // 更新rss源的原始信息
+  updateSourceOriginInfo(id: number, feed: any) {
+    const deepFeed = JSON.parse(JSON.stringify(feed));
+    delete deepFeed.items;
+    return this.rssPrismaService.updateRssSource(id, {
+      rssOriginInfo: JSON.stringify(deepFeed),
+    });
   }
 
   async fetchRssData(url: string) {
