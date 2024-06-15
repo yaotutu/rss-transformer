@@ -1,6 +1,6 @@
 import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, Validate } from 'class-validator';
+import { IsIn, IsNotEmpty, IsUrl, Validate } from 'class-validator';
 import { IsCronExpression } from './is-cron-expression.validator';
 
 export class CreateTaskDto {
@@ -56,4 +56,11 @@ export class CreateTaskDto {
   })
   @Optional()
   readonly immediate?: boolean;
+
+  @ApiProperty({
+    description: '关联的 RSS 源 URL',
+    example: 'https://example.com/rss',
+  })
+  @IsUrl()
+  readonly rssSourceUrl: string;
 }

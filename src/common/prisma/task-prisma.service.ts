@@ -23,6 +23,7 @@ export class TaskPrismaService extends BasePrismaService {
     taskData: any,
     rssSourceId?: number,
     immediate?: boolean,
+    rssSourceUrl?: string,
   ): Promise<DbTask> {
     try {
       return await this.prisma.task.create({
@@ -34,6 +35,7 @@ export class TaskPrismaService extends BasePrismaService {
           taskData: JSON.stringify(taskData),
           rssSourceId,
           immediate,
+          rssSourceUrl,
         },
       });
     } catch (error) {

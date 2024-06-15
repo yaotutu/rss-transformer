@@ -53,6 +53,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       taskData,
       rssSourceId,
       immediate = false,
+      rssSourceUrl,
     } = createTaskDto;
 
     try {
@@ -71,6 +72,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
         taskData,
         rssSourceId,
         immediate,
+        rssSourceUrl,
       );
 
       // Add the cron job for the task
@@ -128,7 +130,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
   // Method to add a cron job for a task
   private addCronJob(task: DbTask, immediate: boolean) {
-    const { rssSourceId } = task;
+    const { rssSourceId, rssSourceUrl, id } = task;
     const jobName = `task_${task.id}`;
 
     // Check if the job already exists
@@ -149,7 +151,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       const taskInstance = this.taskRegistry.getTask(task.functionName);
       if (taskInstance) {
         try {
-          await taskInstance.execute(data, rssSourceId); // Execute task
+          await taskInstance.execute(data, rssSourceId, rssSourceUrl, id); // Execute task
         } catch (error) {
           this.handleError('TASK', 'Failed to execute task', error);
         }
@@ -191,7 +193,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
   // Method to execute an immediate task
   private async executeImmediateTask(task: DbTask) {
-    const { rssSourceId } = task;
+    const { rssSourceId, rssSourceUrl, id } = task;
     try {
       // Update task status to 'running'
       await this.taskPrismaService.updateTaskStatus(task.id, 'running');
@@ -200,7 +202,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       const data = JSON.parse(task.taskData);
       const taskInstance = this.taskRegistry.getTask(task.functionName);
       if (taskInstance) {
-        await taskInstance.execute(data, rssSourceId);
+        await taskInstance.execute(data, rssSourceId, rssSourceUrl, id);
       }
 
       // Update task status to 'completed' and set immediate to false

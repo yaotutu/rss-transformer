@@ -7,6 +7,7 @@ import { WinstonService } from 'src/common/logger/winston.service';
 import { TaskPrismaService } from 'src/common/prisma/task-prisma.service';
 import { TaskRegistry } from './task.registry';
 import { SayHelloTask } from './tasks/sayHello.task';
+import { GenericLlmTask } from './tasks/generic.llm.task';
 
 @Module({
   imports: [CommonModule],
@@ -17,6 +18,7 @@ import { SayHelloTask } from './tasks/sayHello.task';
     TaskPrismaService,
     WinstonService,
     ErrorHandlingService,
+    GenericLlmTask,
   ],
   controllers: [TaskController],
 })

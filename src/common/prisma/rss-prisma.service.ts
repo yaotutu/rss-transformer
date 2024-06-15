@@ -1,5 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RssSource, RssItem, PrismaClient } from '@prisma/client';
+import {
+  RssSource,
+  RssItem,
+  PrismaClient,
+  RssTransformed,
+} from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
 import { ApiResponse } from '../dto/common.dto';
 import { BasePrismaService } from './base-prisma.service';
@@ -202,5 +207,98 @@ export class RssPrismaService extends BasePrismaService {
         error,
       );
     }
+  }
+  /**
+   * Retrieves unique RSS items for a given task ID and source URL.
+   * @param {number} taskId - The ID of the task.
+   * @param {string} sourceUrl - The source URL of the RSS items.
+   * @returns {Promise<RssItem[]>} - A list of unique RSS items not present in RssTransformed.
+   */
+  async getUniqueRssItems(
+    taskId: number,
+    sourceUrl: string,
+  ): Promise<RssItem[]> {
+    try {
+      // 获取所有与 sourceUrl 相关的 RssItem 数据
+      const rssItems = await this.prisma.rssItem.findMany({
+        where: {
+          rssSource: {
+            sourceUrl: sourceUrl,
+          },
+        },
+      });
+
+      // 检查是否找到 RssItem
+      if (!rssItems.length) {
+        throw new NotFoundException(
+          `No RSS items found for source URL ${sourceUrl}.`,
+        );
+      }
+
+      // 获取所有与 taskId 相关的 RssTransformed 数据
+      const rssTransformed = await this.prisma.rssTransformed.findMany({
+        where: {
+          taskId: taskId,
+        },
+      });
+
+      // 将 RssTransformed 数据的 uniqueArticleId 提取到一个 Set 中
+      const transformedIds = new Set(
+        rssTransformed.map((item) => item.uniqueArticleId),
+      );
+
+      // 过滤出 RssItem 中有但 RssTransformed 中没有的数据
+      const uniqueRssItems = rssItems.filter(
+        (item) => !transformedIds.has(item.uniqueArticleId),
+      );
+
+      return uniqueRssItems;
+    } catch (error) {
+      this.handlePrismaError(
+        'DATABASE',
+        'Failed to retrieve unique RSS items.',
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Writes multiple RSS items into the RssTransformed table using batch insert.
+   * @param {Partial<RssTransformed>[]} data - The array of data to be inserted into RssTransformed table.
+   * @returns {Promise<string[]>} - An array of success messages for each item.
+   */
+  async writeRssItemsToTransformed(
+    data: Partial<RssTransformed>[],
+  ): Promise<string[]> {
+    const successMessages: string[] = [];
+
+    try {
+      // Batch insert into RssTransformed table
+      await this.prisma.rssTransformed.createMany({
+        data: data.map((item) => ({
+          rssItemId: item.rssItemId,
+          taskId: item.taskId,
+          uniqueArticleId: item.uniqueArticleId,
+          itemUrl: item.itemUrl,
+          itemTransformedInfo: item.itemTransformedInfo,
+        })),
+      });
+
+      // Create success messages
+      data.forEach((item) => {
+        const successMessage = `Successfully transformed and inserted RSS item with uniqueArticleId ${item.uniqueArticleId}.`;
+        successMessages.push(successMessage);
+        this.winstonService.info('DATABASE', successMessage);
+      });
+    } catch (error) {
+      const errorMessage = 'Failed to write RSS items to transformed.';
+      this.handlePrismaError('DATABASE', errorMessage, error);
+
+      // Handle error case
+      throw new Error(errorMessage);
+    }
+
+    return successMessages;
   }
 }

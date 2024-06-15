@@ -5,7 +5,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug Nest Framework",
-            "runtimeExecutable": "pnpm",
+            "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run",
                 "start:debug",
