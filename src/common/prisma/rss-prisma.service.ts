@@ -338,15 +338,20 @@ export class RssPrismaService extends BasePrismaService {
         where: { taskId },
       });
 
-      // 构建返回的 JSON 对象
-      const result = {
-        ...JSON.parse(rssSource.rssOriginInfo || '{}'),
-        items: rssTransformedItems.map((item) =>
-          JSON.parse(item.itemTransformedInfo || '{}'),
-        ),
-      };
+      // const rssXmlJson = JSON.parse(rssSource.rssOriginInfo || '{}');
+      // rssXmlJson.entry = rssTransformedItems.map((item) => {
+      //   return JSON.parse(item.itemTransformedInfo || '{}');
+      // });
+      const feed = JSON.parse(rssSource.rssOriginInfo || '{}').feed;
+      const items = rssTransformedItems.map((item) => {
+        return JSON.parse(item.itemTransformedInfo || '{}');
+      });
+      feed.entry = items;
+      // feed.entry = [
+      //   ...items
+      // ],
 
-      return result;
+      return feed;
     } catch (error) {
       this.handlePrismaError(
         'DATABASE',
