@@ -1,3 +1,5 @@
+export type OmitMultiple<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export type ErrorType =
   | 'RSS_PARSER_ERROR'
   | 'HTTP_ERROR'
@@ -20,7 +22,8 @@ export type LogType =
   | 'ADD_RSS_SOURCE'
   | 'UPDATE_RSS_ITEMS'
   | 'MODEL_FACTORY'
-  | 'MODEL_CONFIG';
+  | 'MODEL_CONFIG'
+  | 'RSS_PARSER_TO_XML';
 
 export type tsakType = 'TRANSLATE' | 'UPDATE_RSS_ITEMS';
 

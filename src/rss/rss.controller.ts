@@ -34,6 +34,6 @@ export class RssController {
   @Get('update/:id')
   update(@Param('id', ParseIntPipe) id: string) {
     console.log('id', typeof id, id);
-    return this.rssService.updateItemByRssSourceID(+id);
+    return this.rssService.test();
   }
 }

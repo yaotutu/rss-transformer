@@ -9,6 +9,7 @@ import { WinstonService } from '../logger/winston.service';
 import { ApiException, ApiResponse } from '../dto/common.dto';
 import { BasePrismaService } from './base-prisma.service';
 import { ErrorHandlingService } from '../error-handling/error-handling.service';
+import { OmitMultiple } from 'src/types';
 
 /**
  * Service for interacting with Prisma client to manage RSS sources and items.
@@ -142,12 +143,12 @@ export class RssPrismaService extends BasePrismaService {
    */
   async createRssItems(
     rssSourceId: number,
-    items: Omit<RssItem, 'id'>[],
+    items: OmitMultiple<RssItem, 'id' | 'updatedAt' | 'createdAt'>[],
   ): Promise<{ createdCount: number; skippedCount: number }> {
     try {
       const existingItems = await this.prisma.rssItem.findMany({
         where: {
-          AND: items.map((item) => ({
+          OR: items.map((item) => ({
             rssSourceId,
             uniqueArticleId: item.uniqueArticleId,
           })),

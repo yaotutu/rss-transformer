@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { ModelFactory } from './langchain/model-factory';
 import { ModelConfigService } from './config/model-config.service';
+import { RssParserService } from './rss-parser/rss-parser.service';
 
 @Module({
   providers: [
@@ -23,6 +24,7 @@ import { ModelConfigService } from './config/model-config.service';
     ConfigService,
     ModelFactory,
     ModelConfigService,
+    RssParserService,
   ],
   exports: [
     ResponseInterceptor,
@@ -35,6 +37,7 @@ import { ModelConfigService } from './config/model-config.service';
     ConfigService,
     ModelFactory,
     ModelConfigService,
+    RssParserService,
   ],
 })
 export class CommonModule {}

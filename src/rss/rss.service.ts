@@ -9,6 +9,7 @@ import * as Parser from 'rss-parser';
 import { createHash } from 'node:crypto';
 import { WinstonService } from 'src/common/logger/winston.service';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
+import { RssParserService } from 'src/common/rss-parser/rss-parser.service';
 
 @Injectable()
 export class RssService {
@@ -16,6 +17,7 @@ export class RssService {
   constructor(
     private winstonService: WinstonService,
     private rssPrismaService: RssPrismaService,
+    private rssParserService: RssParserService,
   ) {
     this.parser = new Parser({
       headers: { Accept: 'application/rss+xml, text/xml; q=0.1' },
@@ -65,21 +67,27 @@ export class RssService {
   async updateItemByRssSourceID(id: number): Promise<string> {
     try {
       const rssSource = await this.rssPrismaService.getRssSourceById(id);
-      const feed = await this.fetchRssData(rssSource.sourceUrl);
-      // return;
-      this.updateSourceOriginInfo(id, feed);
-      const items = feed.items.map((item) => ({
+      const parsedUrl = await this.rssParserService.parseUrl(
+        rssSource.sourceUrl,
+      );
+      const { feedInfo, items, rssVsersion } = parsedUrl;
+
+      this.rssPrismaService.updateRssSource(id, {
+        rssOriginInfo: JSON.stringify(feedInfo),
+        rssVsersion,
+      });
+      const organizedItem = items.map((item) => ({
         rssSourceId: id,
-        itemUrl: item.link,
+        itemUrl: item.link.$.href,
         itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
         uniqueArticleId: this.generateUniqueArticleId(
-          item.link,
-          item.content || item.description || '',
+          item.link.$.href,
+          item.content._,
         ),
       }));
 
       const { createdCount, skippedCount } =
-        await this.rssPrismaService.createRssItems(id, items);
+        await this.rssPrismaService.createRssItems(id, organizedItem);
 
       this.winstonService.info(
         'UPDATE_RSS_ITEMS',
@@ -103,66 +111,7 @@ export class RssService {
     }
   }
 
-  // 更新rss源的原始信息
-  updateSourceOriginInfo(id: number, feed: any) {
-    const deepFeed = JSON.parse(JSON.stringify(feed));
-    delete deepFeed.items;
-    return this.rssPrismaService.updateRssSource(id, {
-      rssOriginInfo: JSON.stringify(deepFeed),
-    });
-  }
-
-  async fetchRssData(url: string) {
-    try {
-      const feed = await this.parser.parseURL(url);
-      return feed;
-    } catch (error) {
-      this.winstonService.error(
-        'RSS_PARSER',
-        'The Rss parser has an  error',
-        error,
-      );
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'RSS_PARSER_ERROR',
-          message: 'There was an error parsing the RSS feed.',
-          details: error.message, // Include the actual error message in details
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    // const res = await this.prisma.rssSource.create({
-    // 	data: {
-    // 		sourceUrl: feed.link,
-    // 		sourceTitle: feed.title,
-    // 	},
-    // });
-
-    // const res = await this.prisma.rssSource.findUnique({
-    // 	where: {
-    // 		sourceUrl: "https://www.williamlong.info/1",
-    // 	},
-    // });
-    //    if (!rssSource) {
-    //   throw new Error(`RssSource with id ${articleData.rssSourceId} does not exist`);
-    // }
-    // const res = await this.prisma.article.create({
-    // 	data: {
-    // 		articleUrl: "https://www.williamlong.info/archives/7430.html",
-    // 		articleId: "123456",
-    // 		articleGuid: "unique-guid-123",
-    // 		title: "Example Article",
-    // 		content: "This is the content of the example article.",
-    // 		// rssSource: "https://www.williamlong.info/",
-    // 		rssSource: {
-    // 			connect: {
-    // 				sourceUrl: "https://www.williamlong.info/",
-    // 			},
-    // 		},
-    // 	},
-    // });
-    // console.log(res);
+  async test() {
+    return await this.updateItemByRssSourceID(7);
   }
 }

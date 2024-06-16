@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RssModule } from './rss/rss.module';
-import { CoreRssProcessorModule } from './core-rss-processor/core-rss-processor.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { CommonModule } from './common/common.module';
@@ -14,7 +13,6 @@ import { TransformeredModule } from './transformered/transformered.module';
 @Module({
   imports: [
     RssModule,
-    CoreRssProcessorModule,
     CommonModule,
     TaskModule,
     ScheduleModule.forRoot(),
