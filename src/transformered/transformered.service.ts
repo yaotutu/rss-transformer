@@ -7,7 +7,8 @@ var RSS = require('rss');
 export class TransformeredService {
   constructor(private readonly rssPrismaService: RssPrismaService) {}
   async generateTransformeredByTaskId(id: number) {
-    const rssJsonObj = await this.rssPrismaService.getTransformedRss(id);
+    const rssJsonObj =
+      await this.rssPrismaService.getTransformedRssByTaskId(id);
     const {
       title,
       description,

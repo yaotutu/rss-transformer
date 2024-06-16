@@ -310,7 +310,7 @@ export class RssPrismaService extends BasePrismaService {
    * @param {number} taskId - The ID of the task.
    * @returns {Promise<object>} - A JSON object containing rssOriginInfo and items.
    */
-  async getTransformedRss(taskId: number): Promise<any> {
+  async getTransformedRssByTaskId(taskId: number): Promise<any> {
     try {
       // 尝试获取 taskId 关联的任务信息
       const task = await this.prisma.task.findUnique({

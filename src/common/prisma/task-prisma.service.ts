@@ -39,7 +39,7 @@ export class TaskPrismaService extends BasePrismaService {
         },
       });
     } catch (error) {
-      this.handlePrismaError('DATABASE', 'Failed to create task', error);
+      this.handlePrismaError('DATABASE', '创建任务失败', error);
     }
   }
 
@@ -87,5 +87,15 @@ export class TaskPrismaService extends BasePrismaService {
         error,
       );
     }
+  }
+
+  // 查询 RssTransformed 表中的记录
+  // 根据 taskId 查询 RssTransformed 表中的记录
+  async getTransformedItemsByTaskId(
+    taskId: number,
+  ): Promise<{ uniqueArticleId: string }[]> {
+    return this.prisma.rssTransformed.findMany({
+      where: { taskId },
+    });
   }
 }

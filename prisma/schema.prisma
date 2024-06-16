@@ -42,7 +42,7 @@ model RssTransformed {
   id                  Int      @id @default(autoincrement()) // 主键，自增
   rssItemId           Int // 关联的 RSS 条目 ID，指向 RssItem 表的主键
   taskId              Int // 关联的任务 ID，指向 Task 表的主键
-  uniqueArticleId     String   @unique // 根据文章内容+url hash生成的唯一id
+  uniqueArticleId     String // 根据文章内容+url hash生成的当前任务下的唯一id
   itemUrl             String // 文章 URL
   itemTransformedInfo String? // 每一个处理后 RSS 条目的原始信息
   createdAt           DateTime @default(now()) // 创建时间，默认为当前时间
