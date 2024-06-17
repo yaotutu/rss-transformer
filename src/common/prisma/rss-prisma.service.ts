@@ -260,7 +260,7 @@ export class RssPrismaService extends BasePrismaService {
     } catch (error) {
       this.handlePrismaError(
         'DATABASE',
-        'Failed to retrieve unique RSS items.',
+        '对比 RssItem 和 RssTransformed 数据时出错。',
         error,
       );
       throw error;

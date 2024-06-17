@@ -76,15 +76,28 @@ export class RssService {
         rssOriginInfo: JSON.stringify(feedInfo),
         feedType,
       });
-      const organizedItem = items.map((item) => ({
-        rssSourceId: id,
-        itemUrl: item.link.$.href,
-        itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
-        uniqueArticleId: this.generateUniqueArticleId(
-          item.link.$.href,
-          item.content._,
-        ),
-      }));
+      let organizedItem = [];
+      if (feedType === 'atom') {
+        organizedItem = items.map((item) => ({
+          rssSourceId: id,
+          itemUrl: item.link.$.href,
+          itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
+          uniqueArticleId: this.generateUniqueArticleId(
+            item.link.$.href,
+            item.content._,
+          ),
+        }));
+      } else {
+        organizedItem = items.map((item) => ({
+          rssSourceId: id,
+          itemUrl: item.link,
+          itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
+          uniqueArticleId: this.generateUniqueArticleId(
+            item.link,
+            item.description,
+          ),
+        }));
+      }
 
       const { createdCount, skippedCount } =
         await this.rssPrismaService.createRssItems(id, organizedItem);

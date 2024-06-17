@@ -134,15 +134,7 @@ export class RssParserService {
    */
   private getItemsRss2(parsedXml: any): any[] {
     const channel = parsedXml.rss.channel;
-    return (Array.isArray(channel.item) ? channel.item : [channel.item]).map(
-      (item) => ({
-        title: item.title,
-        link: item.link,
-        description: item.description,
-        pubDate: item.pubDate,
-        id: item.guid._ || item.guid,
-      }),
-    );
+    return channel.item;
   }
 
   /**
@@ -172,7 +164,7 @@ export class RssParserService {
    * @param {any} error - The error object.
    */
   protected handleRssParsingError(message: string, error: any): void {
-    const source: LogType = 'RSS_PARSER_TO_XML'; // Set the appropriate log type
+    const source: LogType = 'PARSER_RSS_TO_JSON'; // Set the appropriate log type
     this.errorHandlingService.handleError(source, message, error);
   }
 }
