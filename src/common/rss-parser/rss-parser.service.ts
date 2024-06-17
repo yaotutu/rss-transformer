@@ -19,17 +19,17 @@ export class RssParserService {
   async parseUrl(url: string): Promise<{
     feedInfo: any;
     items: any[];
-    rssVsersion: string;
+    feedType: string;
   }> {
     try {
       const xml = await this.fetchRssData(url); // Fetch the RSS feed data
       const parsedXml = await this.parseXml(xml); // Parse the XML data
 
-      const rssVsersion = this.detectFeedType(parsedXml); // Detect the feed type
-      const feedInfo = this.extractFeedInfo(parsedXml, rssVsersion); // Extract feed information
-      const items = this.extractItems(parsedXml, rssVsersion); // Extract items
+      const feedType = this.detectFeedType(parsedXml); // Detect the feed type
+      const feedInfo = this.extractFeedInfo(parsedXml, feedType); // Extract feed information
+      const items = this.extractItems(parsedXml, feedType); // Extract items
 
-      return { feedInfo, items, rssVsersion };
+      return { feedInfo, items, feedType };
     } catch (error) {
       this.handleRssParsingError(
         'An error occurred while parsing the RSS feed',
