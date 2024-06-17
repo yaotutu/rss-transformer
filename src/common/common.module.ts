@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { ModelFactory } from './langchain/model-factory';
 import { ModelConfigService } from './config/model-config.service';
 import { RssParserService } from './rss-parser/rss-parser.service';
+import { JsonToXmlService } from './rss-parser/json-to-xml.service';
 
 @Module({
   providers: [
@@ -25,6 +26,7 @@ import { RssParserService } from './rss-parser/rss-parser.service';
     ModelFactory,
     ModelConfigService,
     RssParserService,
+    JsonToXmlService,
   ],
   exports: [
     ResponseInterceptor,
@@ -38,6 +40,7 @@ import { RssParserService } from './rss-parser/rss-parser.service';
     ModelFactory,
     ModelConfigService,
     RssParserService,
+    JsonToXmlService,
   ],
 })
 export class CommonModule {}

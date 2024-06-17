@@ -8,7 +8,7 @@ export class RssParserService {
   private readonly parser: xml2js.Parser;
 
   constructor(private readonly errorHandlingService: ErrorHandlingService) {
-    this.parser = new xml2js.Parser({ explicitArray: false, trim: true });
+    this.parser = new xml2js.Parser({ explicitArray: false, trim: false });
   }
 
   /**

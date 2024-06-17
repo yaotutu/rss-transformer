@@ -338,19 +338,11 @@ export class RssPrismaService extends BasePrismaService {
         where: { taskId },
       });
 
-      // const rssXmlJson = JSON.parse(rssSource.rssOriginInfo || '{}');
-      // rssXmlJson.entry = rssTransformedItems.map((item) => {
-      //   return JSON.parse(item.itemTransformedInfo || '{}');
-      // });
       const feed = JSON.parse(rssSource.rssOriginInfo || '{}').feed;
       const items = rssTransformedItems.map((item) => {
         return JSON.parse(item.itemTransformedInfo || '{}');
       });
       feed.entry = items;
-      // feed.entry = [
-      //   ...items
-      // ],
-
       return feed;
     } catch (error) {
       this.handlePrismaError(
