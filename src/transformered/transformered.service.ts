@@ -13,9 +13,9 @@ export class TransformeredService {
   async generateTransformeredByTaskId(
     id: number,
   ): Promise<ApiResponse<string>> {
-    const rssJsonObj =
+    const { rssJson, feedType } =
       await this.rssPrismaService.getTransformedRssByTaskId(id);
-    const xml = this.jsonToXmlService.convertToJsonToXml(rssJsonObj, 'atom');
+    const xml = this.jsonToXmlService.convertToJsonToXml(rssJson, feedType);
     return new ApiResponse<string>(200, 'Success', xml, undefined, {
       isRss: true,
     });

@@ -41,9 +41,7 @@ export class RssService {
       return await this.updateItemByRssSourceID(rssSourceItem.id);
     } catch (error) {
       this.winstonService.error('ADD_RSS_SOURCE', '添加RSS源时出错', error);
-      throw new ServiceUnavailableException(
-        'RSS feed is currently unavailable. Please try again later.',
-      );
+      throw new ServiceUnavailableException(error.message);
     }
   }
 
@@ -96,6 +94,7 @@ export class RssService {
             item.link,
             item.description,
           ),
+          feedType,
         }));
       }
 

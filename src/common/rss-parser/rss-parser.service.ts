@@ -118,13 +118,9 @@ export class RssParserService {
    * @returns {any} - The feed information.
    */
   private getFeedInfoRss2(parsedXml: any): any {
-    const channel = parsedXml.rss.channel;
-    return {
-      title: channel.title,
-      link: channel.link,
-      description: channel.description,
-      lastBuildDate: channel.lastBuildDate,
-    };
+    const deepFeed = JSON.parse(JSON.stringify(parsedXml));
+    delete deepFeed.rss.channel.item;
+    return deepFeed;
   }
 
   /**

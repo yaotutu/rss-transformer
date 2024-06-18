@@ -234,9 +234,14 @@ export class RssPrismaService extends BasePrismaService {
 
       // 检查是否找到 RssItem
       if (!rssItems.length) {
-        throw new NotFoundException(
-          `No RSS items found for source URL ${sourceUrl}.`,
+        this.winstonService.info(
+          'GENERAL',
+          'getUniqueRssItems,No RSS items found ',
         );
+        return [];
+        // throw new NotFoundException(
+        //   `No RSS items found for source URL ${sourceUrl}.`,
+        // );
       }
 
       // 获取所有与 taskId 相关的 RssTransformed 数据
@@ -322,7 +327,6 @@ export class RssPrismaService extends BasePrismaService {
       }
 
       const rssSourceId = task.rssSourceId;
-
       const rssSource = await this.prisma.rssSource.findUnique({
         where: { id: rssSourceId },
       });
@@ -337,13 +341,30 @@ export class RssPrismaService extends BasePrismaService {
       const rssTransformedItems = await this.prisma.rssTransformed.findMany({
         where: { taskId },
       });
+      const { feedType } = rssSource;
+      // 根据不同的协议类型,返回不同的json字段
 
-      const feed = JSON.parse(rssSource.rssOriginInfo || '{}').feed;
-      const items = rssTransformedItems.map((item) => {
-        return JSON.parse(item.itemTransformedInfo || '{}');
-      });
-      feed.entry = items;
-      return feed;
+      if (feedType === 'atom') {
+        const rssJson = JSON.parse(rssSource.rssOriginInfo || '{}').feed;
+        const items = rssTransformedItems.map((item) => {
+          return JSON.parse(item.itemTransformedInfo || '{}');
+        });
+        rssJson.entry = items;
+        return {
+          feedType,
+          rssJson,
+        };
+      } else {
+        const rssJson = JSON.parse(rssSource.rssOriginInfo || '{}');
+        const items = rssTransformedItems.map((item) => {
+          return JSON.parse(item.itemTransformedInfo || '{}');
+        });
+        rssJson.item = items;
+        return {
+          feedType,
+          rssJson,
+        };
+      }
     } catch (error) {
       this.handlePrismaError(
         'DATABASE',

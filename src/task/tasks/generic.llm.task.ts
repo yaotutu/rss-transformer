@@ -29,8 +29,21 @@ export class GenericLlmTask implements Task {
       return;
     }
     const rssTransformedItems = rssItems.map((item) => {
+      const { feedType } = item;
+      let defaultConetentTag = '';
+      if (feedType === 'rss2') {
+        defaultConetentTag = 'description';
+      } else {
+        defaultConetentTag = 'content';
+      }
+
       const rssItemInfo = JSON.parse(item.itemOriginInfo);
-      rssItemInfo.content._ = 'helloworld！';
+      // rssItemInfo.content._ = 'helloworld！';
+      item[defaultConetentTag] = this.modifyTagContent(
+        rssItemInfo,
+        defaultConetentTag,
+        'helloworld！',
+      );
       return {
         rssItemId: item.id,
         taskId: taskId,
@@ -40,5 +53,38 @@ export class GenericLlmTask implements Task {
       };
     });
     this.rssPrismaService.writeRssItemsToTransformed(rssTransformedItems);
+  }
+
+  /**
+   * 修改指定标签的值
+   * @param {Object} item - 要修改的item对象
+   * @param {string} tagName - 标签名称
+   * @param {string} newValue - 新的值
+   */
+  modifyTagContent(item, tagName, newValue) {
+    if (item[tagName]) {
+      const content = item[tagName];
+      if (Array.isArray(content)) {
+        content.forEach((element, index) => {
+          if (typeof element === 'object' && element !== null) {
+            if ('$' in element) {
+              element._ = newValue; // 如果有 $, 修改 _
+            } else {
+              item[tagName][index] = newValue; // 如果没有 $, 直接修改
+            }
+          } else {
+            item[tagName][index] = newValue;
+          }
+        });
+      } else if (typeof content === 'object' && content !== null) {
+        if ('$' in content) {
+          content._ = newValue; // 如果有 $, 修改 _
+        } else {
+          item[tagName] = newValue; // 如果没有 $, 直接修改
+        }
+      } else {
+        item[tagName] = newValue;
+      }
+    }
   }
 }

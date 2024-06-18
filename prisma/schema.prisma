@@ -13,7 +13,7 @@ model RssSource {
   sourceUrl     String   @unique // 文章来源 URL
   customName    String? // 用户自定义名称
   rssOriginInfo String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
-  feedType      String? // RSS 版本
+  feedType      String? // RSS 类型 atom/rss
   createdAt     DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt     DateTime @updatedAt // 更新时间戳
 
@@ -26,6 +26,7 @@ model RssSource {
 model RssItem {
   id              Int      @id @default(autoincrement()) // 主键，自增
   rssSourceId     Int // 关联的 RSS 源 ID，指向 RssSource 表的主键
+  feedType        String? // RSS 类型 atom/rss
   uniqueArticleId String // 根据文章内容+url hash生成的唯一id
   itemUrl         String // 文章 URL
   itemOriginInfo  String? // 每一个rssItem的原始信息
@@ -45,6 +46,7 @@ model RssTransformed {
   uniqueArticleId     String // 根据文章内容+url hash生成的当前任务下的唯一id
   itemUrl             String // 文章 URL
   itemTransformedInfo String? // 每一个处理后 RSS 条目的原始信息
+  feedType            String? // RSS 类型 atom/rss
   createdAt           DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt           DateTime @updatedAt // 更新时间戳，系统自动生成
   rssItem             RssItem  @relation(fields: [rssItemId], references: [id]) // 与 RssItem 表的关系
