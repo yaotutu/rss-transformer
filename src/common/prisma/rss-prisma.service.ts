@@ -359,7 +359,7 @@ export class RssPrismaService extends BasePrismaService {
         const items = rssTransformedItems.map((item) => {
           return JSON.parse(item.itemTransformedInfo || '{}');
         });
-        rssJson.item = items;
+        rssJson.rss.channel.item = items;
         return {
           feedType,
           rssJson,
