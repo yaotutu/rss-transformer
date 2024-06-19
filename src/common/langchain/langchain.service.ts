@@ -13,29 +13,33 @@ export class LangchainService {
     this.model = this.modelFactory.getModel('OpenAI'); // 默认使用 OpenAI 模型
   }
 
-  async getTest(): Promise<any> {
+  async translateParagraphs(paragraphss?: string[]): Promise<string[]> {
+    const paragraphs = [];
     const prompt = ChatPromptTemplate.fromMessages([
       [
         'system',
-        '你是一个翻译官,我会给你一个json对象,你需要将以下字段对应的内容帮我翻译成中文,具体需要翻译的字段如下:',
+        '下面我让你来充当翻译家，你的目标是把任何语言翻译成中文，请翻译时不要带翻译腔，而是要翻译得自然、流畅和地道，使用优美和高雅的表达方式。',
       ],
       ['user', '{input}'],
     ]);
+
     const chain = prompt.pipe(this.model);
 
     try {
-      const res = await chain.invoke({
-        input: `
-          {
-            "field1": "This is some text that needs to be translated",
-            "field2": "And also this text"
-          }
-        `,
-      });
+      // 构造待翻译的段落对象
+      const inputObject = paragraphs.reduce((acc, paragraph, index) => {
+        acc[`field${index + 1}`] = paragraph;
+        return acc;
+      }, {});
+
+      // 转换成 JSON 格式的字符串
+      const input = JSON.stringify(inputObject, null, 2);
+
+      const res = await chain.invoke({ input });
       console.log({ res });
-      return res;
+      return Object.values(res); // 返回翻译后的结果数组
     } catch (error) {
-      console.error(error);
+      console.error('Error translating paragraphs:', error);
       throw error;
     }
   }
