@@ -9,13 +9,14 @@ datasource db {
 
 // RssSource 模型：存储 RSS 源的基本信息
 model RssSource {
-  id            Int      @id @default(autoincrement()) // 主键，自增
-  sourceUrl     String   @unique // 文章来源 URL
-  customName    String? // 用户自定义名称
-  rssOriginInfo String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
-  feedType      String? // RSS 类型 atom/rss
-  createdAt     DateTime @default(now()) // 创建时间，默认为当前时间
-  updatedAt     DateTime @updatedAt // 更新时间戳
+  id             Int      @id @default(autoincrement()) // 主键，自增
+  sourceUrl      String   @unique // 文章来源 URL
+  customName     String? // 用户自定义名称
+  rssOriginInfo  String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
+  feedType       String? // RSS 类型 atom/rss
+  xmlDeclaration String? // xml声明
+  createdAt      DateTime @default(now()) // 创建时间，默认为当前时间
+  updatedAt      DateTime @updatedAt // 更新时间戳
 
   // 关系字段
   rssItems RssItem[] // 与 RssItem 表的关系 (一对多)

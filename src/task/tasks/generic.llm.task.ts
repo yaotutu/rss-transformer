@@ -1,6 +1,5 @@
 // src/task/tasks/sayHello.task.ts
 import { Injectable } from '@nestjs/common';
-import { RssTransformed } from '@prisma/client';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { TaskPrismaService } from 'src/common/prisma/task-prisma.service';
 import { Task } from 'src/types';

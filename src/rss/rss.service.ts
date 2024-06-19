@@ -68,7 +68,7 @@ export class RssService {
       const parsedUrl = await this.rssParserService.parseUrl(
         rssSource.sourceUrl,
       );
-      const { feedInfo, items, feedType } = parsedUrl;
+      const { feedInfo, items, feedType, xmlDeclaration } = parsedUrl;
 
       this.rssPrismaService.updateRssSource(id, {
         rssOriginInfo: JSON.stringify(feedInfo),

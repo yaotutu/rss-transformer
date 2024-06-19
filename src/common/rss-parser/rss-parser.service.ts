@@ -20,16 +20,17 @@ export class RssParserService {
     feedInfo: any;
     items: any[];
     feedType: string;
+    xmlDeclaration: string;
   }> {
     try {
       const xml = await this.fetchRssData(url); // Fetch the RSS feed data
-      const parsedXml = await this.parseXml(xml); // Parse the XML data
+      const { parsed, xmlDeclaration } = await this.parseXml(xml); // Parse the XML data
 
-      const feedType = this.detectFeedType(parsedXml); // Detect the feed type
-      const feedInfo = this.extractFeedInfo(parsedXml, feedType); // Extract feed information
-      const items = this.extractItems(parsedXml, feedType); // Extract items
+      const feedType = this.detectFeedType(parsed); // Detect the feed type
+      const feedInfo = this.extractFeedInfo(parsed, feedType); // Extract feed information
+      const items = this.extractItems(parsed, feedType); // Extract items
 
-      return { feedInfo, items, feedType };
+      return { feedInfo, items, feedType, xmlDeclaration };
     } catch (error) {
       this.handleRssParsingError(
         'An error occurred while parsing the RSS feed',
@@ -55,14 +56,28 @@ export class RssParserService {
   /**
    * Parses the XML data using the XML parser.
    * @param {string} xml - The XML data to parse.
-   * @returns {Promise<any>} - A promise that resolves with the parsed XML object.
+   * @returns {Promise<any>} - A promise that resolves with the parsed XML object and XML declaration.
    */
-  private async parseXml(xml: string): Promise<any> {
+  private async parseXml(
+    xml: string,
+  ): Promise<{ parsed: any; xmlDeclaration: string }> {
     try {
-      return await this.parser.parseStringPromise(xml);
+      const xmlDeclaration = this.extractXmlDeclaration(xml);
+      const parsed = await this.parser.parseStringPromise(xml);
+      return { parsed, xmlDeclaration };
     } catch (error) {
       throw new Error(`Failed to parse XML: ${error.message}`);
     }
+  }
+
+  /**
+   * Extracts the XML declaration from the XML string.
+   * @param {string} xml - The XML data as a string.
+   * @returns {string} - The XML declaration.
+   */
+  private extractXmlDeclaration(xml: string): string {
+    const match = xml.match(/<\?xml\s.*?\?>/);
+    return match ? match[0] : '';
   }
 
   /**
