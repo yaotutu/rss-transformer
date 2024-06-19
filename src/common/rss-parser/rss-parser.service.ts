@@ -2,6 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as xml2js from 'xml2js';
 import { ErrorHandlingService } from '../error-handling/error-handling.service';
 import { LogType } from 'src/types';
+import * as iconv from 'iconv-lite';
 
 @Injectable()
 export class RssParserService {
@@ -50,7 +51,20 @@ export class RssParserService {
     if (!response.ok) {
       throw new Error(`Failed to fetch RSS feed. Status: ${response.status}`);
     }
-    return response.text(); // Return the fetched XML data
+    const buffer = await response.arrayBuffer();
+    const bufferStr = Buffer.from(buffer);
+
+    // Check encoding and decode
+    const encodingMatch = bufferStr
+      .toString()
+      .match(/<\?xml.*encoding="(.*?)".*\?>/);
+    const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : 'utf-8';
+
+    if (encoding === 'gb2312') {
+      return iconv.decode(bufferStr, 'gb2312');
+    } else {
+      return bufferStr.toString('utf-8');
+    }
   }
 
   /**
