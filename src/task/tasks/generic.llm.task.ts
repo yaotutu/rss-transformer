@@ -1,5 +1,6 @@
 // src/task/tasks/sayHello.task.ts
 import { Injectable } from '@nestjs/common';
+import { LangchainService } from 'src/common/langchain/langchain.service';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { TaskPrismaService } from 'src/common/prisma/task-prisma.service';
 import { Task } from 'src/types';
@@ -10,6 +11,7 @@ export class GenericLlmTask implements Task {
     private rssPrismaService: RssPrismaService,
 
     private taskPrismaService: TaskPrismaService,
+    private langChainService: LangchainService,
   ) {}
 
   async execute(
@@ -27,30 +29,37 @@ export class GenericLlmTask implements Task {
     if (rssItems.length === 0) {
       return;
     }
-    const rssTransformedItems = rssItems.map((item) => {
-      const { feedType } = item;
-      let defaultConetentTag = '';
-      if (feedType === 'rss2') {
-        defaultConetentTag = 'description';
-      } else {
-        defaultConetentTag = 'content';
-      }
+    const rssTransformedItems = await Promise.all(
+      rssItems.map(async (item) => {
+        const { feedType } = item;
+        let defaultConetentTag = '';
+        if (feedType === 'rss2') {
+          defaultConetentTag = 'description';
+        } else {
+          defaultConetentTag = 'content';
+        }
 
-      const rssItemInfo = JSON.parse(item.itemOriginInfo);
-      // rssItemInfo.content._ = 'helloworld！';
-      item[defaultConetentTag] = this.modifyTagContent(
-        rssItemInfo,
-        defaultConetentTag,
-        'helloworld！',
-      );
-      return {
-        rssItemId: item.id,
-        taskId: taskId,
-        uniqueArticleId: item.uniqueArticleId,
-        itemUrl: item.itemUrl,
-        itemTransformedInfo: JSON.stringify(rssItemInfo),
-      };
-    });
+        let rssItemInfo = JSON.parse(item.itemOriginInfo);
+        // rssItemInfo.content._ = 'helloworld！';
+        const transedString =
+          await this.langChainService.translateSingleParagraph(
+            rssItemInfo[defaultConetentTag],
+          );
+        // 修改标签内容
+        rssItemInfo = this.modifyTagContent(
+          rssItemInfo,
+          defaultConetentTag,
+          transedString,
+        );
+        return {
+          rssItemId: item.id,
+          taskId: taskId,
+          uniqueArticleId: item.uniqueArticleId,
+          itemUrl: item.itemUrl,
+          itemTransformedInfo: JSON.stringify(rssItemInfo),
+        };
+      }),
+    );
     this.rssPrismaService.writeRssItemsToTransformed(rssTransformedItems);
   }
 
@@ -60,7 +69,8 @@ export class GenericLlmTask implements Task {
    * @param {string} tagName - 标签名称
    * @param {string} newValue - 新的值
    */
-  modifyTagContent(item, tagName, newValue) {
+  modifyTagContent(itemInfo, tagName, newValue) {
+    const item = JSON.parse(JSON.stringify(itemInfo));
     if (item[tagName]) {
       const content = item[tagName];
       if (Array.isArray(content)) {
@@ -85,5 +95,6 @@ export class GenericLlmTask implements Task {
         item[tagName] = newValue;
       }
     }
+    return item;
   }
 }

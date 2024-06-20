@@ -21,7 +21,7 @@ export class TaskController {
 
   @Get()
   getHello(): any {
-    return this.langchainService.translateParagraphs();
+    // return this.langchainService.translateParagraphs();
   }
   // @Post()
   // create(@Body() createItemDto: CreateItemDto) {

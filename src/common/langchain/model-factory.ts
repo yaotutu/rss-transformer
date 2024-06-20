@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ModelConfigService } from '../config/model-config.service';
 import { ChatOpenAI } from '@langchain/openai';
 import { WinstonService } from '../logger/winston.service';
+import { Ollama } from '@langchain/community/llms/ollama';
 
 @Injectable()
 export class ModelFactory {
@@ -45,6 +46,8 @@ export class ModelFactory {
     switch (modelType) {
       case 'OpenAI':
         return ChatOpenAI; // Assuming ChatOpenAI is the model class
+      case 'Ollama': // 添加这一行
+        return Ollama; // 添加这一行
       // Add more model classes here as needed
       default:
         this.logger.error('MODEL_FACTORY', `Unknown model type: ${modelType}`);

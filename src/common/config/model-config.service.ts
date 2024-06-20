@@ -17,6 +17,10 @@ export class ModelConfigService {
       azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
       azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
     }),
+    Ollama: () => ({
+      baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+      model: process.env.OLLAMA_MODEL || 'qwen2:1.5b',
+    }),
     // Add more model configs here as needed
   };
 
