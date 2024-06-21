@@ -20,6 +20,11 @@ export class GenericLlmTask implements Task {
     rssSourceUrl: string,
     taskId: number,
   ): Promise<void> {
+    const taskData = JSON.parse(data);
+    const { taskType } = taskData;
+    if (taskType === 'translate') {
+      const taskFn = this.langChainService.translateSingleParagraph;
+    }
     // 这里拿到的是去重过的数据，直接处理就好，不用关心是否重复
     const rssItems = await this.rssPrismaService.getUniqueRssItems(
       taskId,

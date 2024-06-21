@@ -55,7 +55,6 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       immediate = false,
       rssSourceUrl,
     } = createTaskDto;
-
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
