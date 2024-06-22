@@ -12,16 +12,16 @@ export abstract class BasePrismaService {
 
   /**
    * Initializes the Prisma client and injects the WinstonService.
+   * @param {PrismaClient} prisma - The Prisma client.
    * @param {WinstonService} winstonService - The Winston logging service.
+   * @param {ErrorHandlingService} errorHandlingService - The error handling service.
    */
   constructor(
+    prisma: PrismaClient,
     protected winstonService: WinstonService,
     protected errorHandlingService: ErrorHandlingService,
   ) {
-    // Ensure that PrismaClient is a singleton
-    if (!this.prisma) {
-      this.prisma = new PrismaClient();
-    }
+    this.prisma = prisma;
   }
 
   /**

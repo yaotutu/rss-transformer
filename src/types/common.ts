@@ -1,3 +1,5 @@
+export type OmitMultiple<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export type ErrorType =
   | 'RSS_PARSER_ERROR'
   | 'HTTP_ERROR'
@@ -18,7 +20,10 @@ export type LogType =
   | 'DATABASE'
   | 'GENERAL'
   | 'ADD_RSS_SOURCE'
-  | 'UPDATE_RSS_ITEMS';
+  | 'UPDATE_RSS_ITEMS'
+  | 'MODEL_FACTORY'
+  | 'MODEL_CONFIG'
+  | 'PARSER_RSS_TO_JSON';
 
 export type tsakType = 'TRANSLATE' | 'UPDATE_RSS_ITEMS';
 
@@ -28,3 +33,12 @@ export type taskStatus =
   | 'FAILED'
   | 'IN_PROGRESS'
   | 'NOT_STARTED';
+
+export interface Task {
+  execute(
+    data: any,
+    rssSourceId: number,
+    rssSourceUrl: string,
+    taskId: number,
+  ): Promise<any>;
+}

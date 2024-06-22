@@ -1,34 +1,34 @@
 // src/task/task.service.ts
-import { Injectable, OnModuleInit } from '@nestjs/common';
+
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { Task } from '@prisma/client';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { TaskPrismaService } from '../common/prisma/task-prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { WinstonService } from '../common/logger/winston.service';
-import { ErrorHandlingService } from 'src/common/error-handling/error-handling.service';
-import { LogType } from 'src/types/common';
-import { ApiException } from 'src/common/dto/common.dto';
+import { ErrorHandlingService } from '../common/error-handling/error-handling.service';
+import { LogType } from '../types/common';
+import { TaskRegistry } from './task.registry';
+import { ApiException } from '../common/dto/common.dto';
+import { Task as DbTask } from '@prisma/client';
 
 @Injectable()
-export class TaskService implements OnModuleInit {
-  private currentTasks = new Map<number, string>();
+export class TaskService implements OnModuleInit, OnModuleDestroy {
+  private currentTasks = new Map<number, string>(); // Map to store current tasks and their job names
+  private scheduledJobs = new Map<number, CronJob>(); // Map to store scheduled jobs
 
   constructor(
     private taskPrismaService: TaskPrismaService,
     private schedulerRegistry: SchedulerRegistry,
     private winstonService: WinstonService,
     private errorHandlingService: ErrorHandlingService,
+    private taskRegistry: TaskRegistry,
   ) {}
 
-  /**
-   * Lifecycle hook, called once the module has been initialized.
-   * Synchronizes tasks on module initialization.
-   */
+  // Lifecycle hook, called once the module has been initialized
   async onModuleInit() {
     try {
-      await this.syncTasks();
+      await this.syncTasks(); // Synchronize tasks on module initialization
     } catch (error) {
       this.handleError(
         'TASK',
@@ -38,12 +38,13 @@ export class TaskService implements OnModuleInit {
     }
   }
 
-  /**
-   * Creates a new task.
-   * @param {CreateTaskDto} createTaskDto - The DTO containing task information.
-   * @returns {Promise<Task | string>} - The created task or an error message.
-   */
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task | string> {
+  // Lifecycle hook, called once the module is being destroyed
+  async onModuleDestroy() {
+    await this.clearScheduledJobs(); // Clear all scheduled jobs when module is destroyed
+  }
+
+  // Endpoint to create a new task
+  async createTask(createTaskDto: CreateTaskDto): Promise<DbTask | string> {
     const {
       name,
       schedule,
@@ -52,8 +53,8 @@ export class TaskService implements OnModuleInit {
       taskData,
       rssSourceId,
       immediate = false,
+      rssSourceUrl,
     } = createTaskDto;
-
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
@@ -61,6 +62,7 @@ export class TaskService implements OnModuleInit {
         throw new ApiException(400, `Task with name '${name}' already exists.`);
       }
 
+      // Create the task in the database
       const task = await this.taskPrismaService.createTask(
         name,
         schedule,
@@ -69,52 +71,53 @@ export class TaskService implements OnModuleInit {
         taskData,
         rssSourceId,
         immediate,
+        rssSourceUrl,
       );
-      this.addCronJob(task);
+
+      // Add the cron job for the task
+      this.addCronJob(task, immediate);
+
       return task;
     } catch (error) {
       this.handleError('TASK', 'Failed to create task', error);
+      return error.message || 'Failed to create task';
     }
   }
 
-  /**
-   * Retrieves all tasks.
-   * @returns {Promise<Task[]>} - A list of all tasks.
-   */
-  async getAllTasks(): Promise<Task[]> {
+  // Endpoint to fetch all tasks
+  async getAllTasks(): Promise<DbTask[]> {
     try {
       return await this.taskPrismaService.getAllTasks();
     } catch (error) {
       this.handleError('TASK', 'Failed to fetch all tasks', error);
+      return [];
     }
   }
 
-  /**
-   * Synchronizes tasks based on their schedule.
-   */
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  // Method to synchronize tasks
   async syncTasks() {
     try {
-      const tasks = await this.getAllTasks();
+      const tasks = await this.getAllTasks(); // Fetch all tasks from the database
 
       // Remove jobs that are no longer in the database
-      for (const [taskId, jobName] of this.currentTasks) {
+      for (const [taskId] of this.currentTasks) {
         if (!tasks.some((task) => task.id === taskId)) {
-          if (this.schedulerRegistry.doesExist('cron', jobName)) {
-            this.schedulerRegistry.deleteCronJob(jobName);
-            this.winstonService.warn('TASK', `Removed job ${jobName}`);
-          }
-          this.currentTasks.delete(taskId);
+          await this.removeScheduledJob(taskId);
         }
       }
 
-      // Add new tasks
+      // Add new or updated tasks
       for (const task of tasks) {
         if (!this.currentTasks.has(task.id)) {
-          this.addCronJob(task);
+          this.addCronJob(task, task.immediate);
+        } else {
+          const cronJob = this.scheduledJobs.get(task.id);
+          if (cronJob && cronJob.cronTime.source !== task.schedule) {
+            await this.updateScheduledJob(task);
+          }
         }
 
-        // 检查并执行需要立即运行的任务
+        // Execute immediate task if needed
         if (task.immediate && task.status === 'pending') {
           this.executeImmediateTask(task);
         }
@@ -124,14 +127,12 @@ export class TaskService implements OnModuleInit {
     }
   }
 
-  /**
-   * Adds a cron job for the given task.
-   * @param {Task} task - The task for which to add the cron job.
-   */
-  private addCronJob(task: Task) {
+  // Method to add a cron job for a task
+  private addCronJob(task: DbTask, immediate: boolean) {
+    const { rssSourceId, rssSourceUrl, id } = task;
     const jobName = `task_${task.id}`;
 
-    // 检查是否存在相同名称的 Cron Job
+    // Check if the job already exists
     if (this.schedulerRegistry.doesExist('cron', jobName)) {
       this.winstonService.warn(
         'TASK',
@@ -140,81 +141,123 @@ export class TaskService implements OnModuleInit {
       return;
     }
 
+    // Callback function for the cron job
     const jobCallback = async () => {
       this.winstonService.debug('TASK', `Running task: ${task.name}`);
-      const data = JSON.parse(task.taskData);
-      const method = (this as any)[task.functionName];
-      if (typeof method === 'function') {
+      const data = JSON.parse(task.taskData); // Parse task data
+
+      // Retrieve the task instance from registry and execute
+      const taskInstance = this.taskRegistry.getTask(task.functionName);
+      if (taskInstance) {
         try {
-          await method.call(this, data);
+          await taskInstance.execute(data, rssSourceId, rssSourceUrl, id); // Execute task
         } catch (error) {
           this.handleError('TASK', 'Failed to execute task', error);
         }
       } else {
-        this.winstonService.error(
-          'TASK',
-          `Unknown function: ${task.functionName}`,
-        );
+        this.winstonService.error('TASK', `Unknown task: ${task.functionName}`);
       }
     };
 
+    // Create a new cron job
     const cronJob = new CronJob(
       task.schedule,
       jobCallback,
       null,
-      false,
-      'Asia/Shanghai',
+      immediate, // Start immediately if 'immediate' is true
+      'Asia/Shanghai', // Timezone
     );
 
+    // Register the cron job and start it
     this.schedulerRegistry.addCronJob(jobName, cronJob);
-    cronJob.start();
+    if (!immediate) {
+      cronJob.start();
+    }
+
+    // Track the current tasks and scheduled jobs
     this.currentTasks.set(task.id, jobName);
+    this.scheduledJobs.set(task.id, cronJob);
+
+    // Log the addition of the cron job
     this.winstonService.info(
       'TASK',
       `Job ${jobName} added with schedule ${task.schedule}`,
     );
+
+    // Execute immediate task if needed
+    if (immediate) {
+      jobCallback();
+    }
   }
 
-  /**
-   * Executes a task immediately.
-   * @param {Task} task - The task to execute immediately.
-   */
-  private async executeImmediateTask(task: Task) {
+  // Method to execute an immediate task
+  private async executeImmediateTask(task: DbTask) {
+    const { rssSourceId, rssSourceUrl, id } = task;
     try {
-      // 更新任务状态为正在执行
+      // Update task status to 'running'
       await this.taskPrismaService.updateTaskStatus(task.id, 'running');
 
-      // 异步执行任务函数
+      // Parse task data and execute task
       const data = JSON.parse(task.taskData);
-      const method = (this as any)[task.functionName];
-      if (typeof method === 'function') {
-        await method.call(this, data);
+      const taskInstance = this.taskRegistry.getTask(task.functionName);
+      if (taskInstance) {
+        await taskInstance.execute(data, rssSourceId, rssSourceUrl, id);
       }
 
-      // 更新任务状态为已完成，并将 immediate 标记为 false
+      // Update task status to 'completed' and set immediate to false
       await this.taskPrismaService.updateTaskStatusAndImmediate(
         task.id,
         'completed',
         false,
       );
     } catch (error) {
-      // 处理错误，更新任务状态为失败
+      // Handle task execution failure
       await this.taskPrismaService.updateTaskStatus(task.id, 'failed');
       this.handleError('TASK', 'Failed to execute immediate task', error);
     }
   }
 
-  sayHello() {
-    console.log('Hello');
+  // Method to remove a scheduled job
+  private async removeScheduledJob(taskId: number) {
+    const jobName = this.currentTasks.get(taskId);
+    if (jobName) {
+      this.schedulerRegistry.deleteCronJob(jobName);
+      this.winstonService.warn('TASK', `Removed job ${jobName}`);
+      this.currentTasks.delete(taskId);
+      this.scheduledJobs.delete(taskId);
+    }
   }
 
-  /**
-   * Handles errors by delegating to the ErrorHandlingService.
-   * @param {LogType} source - The source or type of the log (e.g., TASK, DATABASE).
-   * @param {string} message - The error message.
-   * @param {any} error - The error object.
-   */
+  // Method to update a scheduled job
+  private async updateScheduledJob(task: DbTask) {
+    await this.removeScheduledJob(task.id);
+    this.addCronJob(task, task.immediate);
+  }
+
+  // Error handling method
   private handleError(source: LogType, message: string, error: any) {
     this.errorHandlingService.handleError(source, message, error);
+  }
+
+  // Method to clear all scheduled jobs
+  private async clearScheduledJobs() {
+    for (const cronJob of this.scheduledJobs.values()) {
+      cronJob.stop(); // Stop each cron job
+    }
+    this.scheduledJobs.clear(); // Clear the map of scheduled jobs
+  }
+
+  // Method to output the current task list
+  async outputCurrentTaskList() {
+    this.winstonService.info('TASK', 'Current scheduled tasks:');
+    this.currentTasks.forEach((jobName, taskId) => {
+      const task = this.scheduledJobs.get(taskId);
+      if (task) {
+        this.winstonService.info(
+          'TASK',
+          `Job ${jobName} - Schedule: ${task.cronTime.source}`,
+        );
+      }
+    });
   }
 }
