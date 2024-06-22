@@ -1,85 +1,164 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue';
+import { rssController } from './services/api';
+import { reactive } from 'vue';
+
+// 使用 ref 创建响应式变量来存储输入框的值
+const addRssUrl = ref('');
+const addRssCustomName = ref('');
+// form表单数据
+const taskForm = reactive({
+  rssSourceUrl: '',
+  rssSourceId: '',
+  name: '',
+  schedule: '',
+  taskType: '',
+  functionName: '',
+  taskData: '',
+  immediate: '',
+});
+// rss源下拉列表数据
+const rssSourceUrlOptions = ref([{ label: 'label', value: 'value' }]);
+let rssSourceUrl = ref([]);
+
+const taskCornOptions = [
+  { label: '每15分钟', value: '*/15 * * * *' },
+  { label: '每30分钟', value: '*/30 * * * *' },
+  { label: '每小时', value: '0 * * * *' },
+  { label: '每3小时', value: '0 */3 * * *' },
+  { label: '每6小时', value: '0 */6 * * *' },
+  { label: '每12小时', value: '0 */12 * * *' },
+  { label: '每天', value: '0 0 * * *' },
+  { label: '每两天', value: '0 0 */2 * *' },
+  { label: '每三天', value: '0 0 */3 * *' },
+  { label: '每五天', value: '0 0 */5 * *' },
+  { label: '每周', value: '0 0 * * 0' },
+];
+
+// 初始化获取数据
+const fetchRssSourceOptions = async () => {
+  const response = await rssController.findAllRss();
+  rssSourceUrl.value = response;
+  const options = response.map((item) => {
+    return {
+      label: `${item.sourceUrl} / ${item.customName}`,
+      value: item.sourceUrl,
+      key: item.id,
+    };
+  });
+  rssSourceUrlOptions.value = options;
+};
+
+const onSubmit = () => {
+  console.log('submit!');
+};
+
+// 处理按钮点击事件，获取输入框的数据并打印到控制台
+const handleClick = async () => {
+  const res = await rssController.createRss({
+    sourceUrl: addRssUrl.value,
+    customName: addRssCustomName.value,
+  });
+  console.log(addRssInput.value);
+};
+
+const handleRefresh = async () => {
+  // log('refresh');
+  await fetchRssSourceOptions();
+};
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <div class="wrap">
+    <div>添加rss源</div>
+    <el-divider />
+    <div class="rss-wrap">
+      <el-input
+        v-model="addRssUrl"
+        style="width: 240px"
+        placeholder="请输入rss地址"
+      />
+      <el-input
+        v-model="addRssCustomName"
+        style="width: 240px"
+        placeholder="请输入自定义名称"
+      />
+      <!-- 绑定按钮的点击事件 -->
+      <el-button type="primary" @click="handleClick">添加rss源</el-button>
     </div>
-  </header>
+    <el-divider />
 
-  <RouterView />
+    <el-table :data="rssSourceUrl" style="width: 100%">
+      <el-table-column prop="customName" label="自定义别名" width="150" />
+      <el-table-column prop="sourceUrl" label="url地址" width="280" />
+      <el-table-column prop="createdAt" label="创建时间" />
+    </el-table>
+    <el-divider />
+    <el-divider />
+
+    <div class="task-wrap">
+      <div class="header">
+        <div>
+          添加任务(任务的添加是基于rss源的，添加任务之前需要先添加rss源)
+        </div>
+        <el-button type="primary" @click="handleRefresh">刷新rss源</el-button>
+      </div>
+
+      <el-divider />
+
+      <div>
+        <el-form :inline="true" :model="taskForm" class="">
+          <el-form-item>
+            <el-select
+              v-model="taskForm.rssSourceUrl"
+              placeholder="请选择rss源"
+              style="width: 150px"
+            >
+              <el-option
+                v-for="item in rssSourceUrlOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-select
+              v-model="taskForm.schedule"
+              placeholder="选择任务执行周期"
+              style="width: 180px"
+            >
+              <el-option
+                v-for="option in taskCornOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+.wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
+  .task-wrap {
     display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+    flex-direction: column;
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
+    .header {
+      display: flex;
+      flex-direction: row;
+    }
   }
 }
 </style>
