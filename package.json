@@ -6,8 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "bstart": "pnpm run --prefix packages/backend start:dev",
+    "bdev": "pnpm run --prefix packages/backend start:dev",
     "bm": "pnpm run --prefix packages/backend migrate",
-    "bg": "pnpm run --prefix packages/backend generate"
+    "bg": "pnpm run --prefix packages/backend generate",
+    "fdev": "pnpm run --prefix packages/frontend dev"
   }
 }
