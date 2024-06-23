@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import {
-  RssSource,
-  RssItem,
   PrismaClient,
+  RssItem,
+  RssSource,
   RssTransformed,
 } from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
-import { ApiException, ApiResponse } from '../dto/common.dto';
+import { ApiResponse } from '../dto/common.dto';
 import { BasePrismaService } from './base-prisma.service';
 import { ErrorHandlingService } from '../error-handling/error-handling.service';
 import { OmitMultiple } from 'src/types';
@@ -77,8 +77,7 @@ export class RssPrismaService extends BasePrismaService {
     // Create a new RSS source
     try {
       const data = { sourceUrl, customName };
-      const res = await this.prisma.rssSource.create({ data });
-      return res;
+      return await this.prisma.rssSource.create({ data });
     } catch (error) {
       this.handlePrismaError('DATABASE', 'Failed to create RSS source.', error);
     }
@@ -257,11 +256,9 @@ export class RssPrismaService extends BasePrismaService {
       );
 
       // 过滤出 RssItem 中有但 RssTransformed 中没有的数据
-      const uniqueRssItems = rssItems.filter(
+      return rssItems.filter(
         (item) => !transformedIds.has(item.uniqueArticleId),
       );
-
-      return uniqueRssItems;
     } catch (error) {
       this.handlePrismaError(
         'DATABASE',
@@ -346,20 +343,18 @@ export class RssPrismaService extends BasePrismaService {
 
       if (feedType === 'atom') {
         const rssJson = JSON.parse(rssSource.rssOriginInfo || '{}').feed;
-        const items = rssTransformedItems.map((item) => {
+        rssJson.entry = rssTransformedItems.map((item) => {
           return JSON.parse(item.itemTransformedInfo || '{}');
         });
-        rssJson.entry = items;
         return {
           feedType,
           rssJson,
         };
       } else {
         const rssJson = JSON.parse(rssSource.rssOriginInfo || '{}');
-        const items = rssTransformedItems.map((item) => {
+        rssJson.rss.channel.item = rssTransformedItems.map((item) => {
           return JSON.parse(item.itemTransformedInfo || '{}');
         });
-        rssJson.rss.channel.item = items;
         return {
           feedType,
           rssJson,

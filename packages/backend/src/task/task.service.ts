@@ -7,7 +7,7 @@ import { TaskPrismaService } from '../common/prisma/task-prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { WinstonService } from '../common/logger/winston.service';
 import { ErrorHandlingService } from '../common/error-handling/error-handling.service';
-import { LogType } from '../types/common';
+import { LogType } from '../types';
 import { TaskRegistry } from './task.registry';
 import { ApiException } from '../common/dto/common.dto';
 import { Task as DbTask } from '@prisma/client';
