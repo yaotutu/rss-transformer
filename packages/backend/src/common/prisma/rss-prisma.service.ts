@@ -374,4 +374,41 @@ export class RssPrismaService extends BasePrismaService {
       throw error;
     }
   }
+
+  /**
+   * 根据 RSS 源 ID 数组批量删除 RSS 源。
+   * @param {number[]} rssSourceIds - RSS 源 ID 的数组。
+   * @returns {Promise<RssSource[]>} - 已删除的 RSS 源数组。
+   */
+  async deleteRssSources(rssSourceIds: Array<number>): Promise<RssSource[]> {
+    try {
+      // 检查是否存在这些 RSS 源
+      const existingRssSources = await this.prisma.rssSource.findMany({
+        where: { id: { in: rssSourceIds } },
+      });
+
+      if (existingRssSources.length === 0) {
+        this.handlePrismaError('DATABASE', '未找到任何 RSS 源。', null);
+      }
+
+      // 删除这些 RSS 源
+      const deletedRssSources = await this.prisma.rssSource.deleteMany({
+        where: { id: { in: rssSourceIds } },
+      });
+
+      if (deletedRssSources.count === 0) {
+        this.handlePrismaError('DATABASE', '未能删除任何 RSS 源。', null);
+      }
+
+      this.winstonService.info(
+        'DATABASE',
+        `成功删除 RSS 源，源 ID 为：${rssSourceIds.join(', ')}。`,
+      );
+
+      // 返回已删除的 RSS 源
+      return existingRssSources;
+    } catch (error) {
+      this.handlePrismaError('DATABASE', '删除 RSS 源失败。', error);
+    }
+  }
 }

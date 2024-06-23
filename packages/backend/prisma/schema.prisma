@@ -35,7 +35,7 @@ model RssItem {
   createdAt       DateTime @default(now()) // 创建时间，系统自动生成
 
   // 关联关系字段
-  rssSource   RssSource        @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
+  rssSource   RssSource        @relation(fields: [rssSourceId], references: [id], onDelete: Cascade) // 与 RssSource 表的关系
   transformed RssTransformed[] // 与 RssTransformed 表的关系 (一对多)
 }
 
@@ -50,7 +50,7 @@ model RssTransformed {
   feedType            String? // RSS 类型 atom/rss
   createdAt           DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt           DateTime @updatedAt // 更新时间戳，系统自动生成
-  rssItem             RssItem  @relation(fields: [rssItemId], references: [id]) // 与 RssItem 表的关系
+  rssItem             RssItem  @relation(fields: [rssItemId], references: [id], onDelete: Cascade) // 与 RssItem 表的关系，指定 onDelete: Cascade
 }
 
 // Task 模型：存储定时任务信息
@@ -71,5 +71,5 @@ model Task {
   rssSourceUrl String // 关联的 RSS 源 URL，用于生成任务的唯一标识
 
   // 与 RssSource 表的关系 (一对一)
-  rssSource RssSource @relation(fields: [rssSourceId], references: [id]) // 与 RssSource 表的关系
+  rssSource RssSource @relation(fields: [rssSourceId], references: [id], onDelete: Cascade) // 与 RssSource 表的关系，指定 onDelete: Cascade
 }

@@ -55,15 +55,17 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       immediate = false,
       rssSourceUrl,
     } = createTaskDto;
-    const taskData =
-      JSON.stringify(createTaskDto.taskData) || taskMapping[taskType];
+    const taskData = createTaskDto.taskData || taskMapping[taskType];
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
       if (existingTask) {
         throw new ApiException(400, `Task with name '${name}' already exists.`);
       }
-      return;
+      // TODO 增加校验 taskData的合法性
+      if (!taskData) {
+        throw new ApiException(400, `Task data not provided.`);
+      }
 
       // Create the task in the database
       const task = await this.taskPrismaService.createTask(
