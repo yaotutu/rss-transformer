@@ -64,6 +64,12 @@ const handleRefresh = async () => {
   // log('refresh');
   await fetchRssSourceOptions();
 };
+
+// 删除rss源
+const handleRssSourceDelete = async (index, row) => {
+  await rssController.deleteRss([row.id]);
+  rssSourceUrl.value.splice(index, 1);
+};
 </script>
 
 <template>
@@ -90,6 +96,18 @@ const handleRefresh = async () => {
       <el-table-column prop="customName" label="自定义别名" width="150" />
       <el-table-column prop="sourceUrl" label="url地址" width="280" />
       <el-table-column prop="createdAt" label="创建时间" />
+      <el-table-column label="操作">
+        <template #default="scope">
+          <el-button size="small" disabled> Edit</el-button>
+          <el-button
+            size="small"
+            type="danger"
+            @click="handleRssSourceDelete(scope.$index, scope.row)"
+          >
+            Delete
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-divider />
     <el-divider />
@@ -134,6 +152,28 @@ const handleRefresh = async () => {
                 :value="option.value"
               >
               </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-select
+              v-model="taskForm.taskType"
+              placeholder="选择任务类型"
+              style="width: 180px"
+            >
+              <el-option key="TRANSLATE" label="翻译任务" value="TRANSLATE">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-select
+              v-model="taskForm.immediate"
+              placeholder="是否立即执行"
+              style="width: 180px"
+            >
+              <el-option key="1" label="是" value="true"></el-option>
+              <el-option key="0" label="否" value="false"></el-option>
             </el-select>
           </el-form-item>
         </el-form>

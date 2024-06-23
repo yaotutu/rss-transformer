@@ -9,6 +9,7 @@ const appController = {
 const rssController = {
   createRss: (data) => request('/rss', 'POST', data),
   findAllRss: () => request('/rss', 'GET'),
+  deleteRss: (ids) => request(`/rss?ids=${ids.join(',')}`, 'DELETE'), // 修改为使用查询字符串
   findOneRss: (id) => request(`/rss/${id}`, 'GET'),
   updateRss: (id) => request(`/rss/update/${id}`, 'GET'),
 };
