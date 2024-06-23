@@ -11,6 +11,7 @@ import { LogType } from '../types/common';
 import { TaskRegistry } from './task.registry';
 import { ApiException } from '../common/dto/common.dto';
 import { Task as DbTask } from '@prisma/client';
+import { taskMapping } from './task-mapping';
 
 @Injectable()
 export class TaskService implements OnModuleInit, OnModuleDestroy {
@@ -50,17 +51,19 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       schedule,
       taskType,
       functionName,
-      taskData,
       rssSourceId,
       immediate = false,
       rssSourceUrl,
     } = createTaskDto;
+    const taskData =
+      JSON.stringify(createTaskDto.taskData) || taskMapping[taskType];
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
       if (existingTask) {
         throw new ApiException(400, `Task with name '${name}' already exists.`);
       }
+      return;
 
       // Create the task in the database
       const task = await this.taskPrismaService.createTask(

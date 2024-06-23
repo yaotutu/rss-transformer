@@ -1,7 +1,6 @@
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { rssController } from './services/api';
-import { reactive } from 'vue';
 
 // 使用 ref 创建响应式变量来存储输入框的值
 const addRssUrl = ref('');
@@ -39,14 +38,13 @@ const taskCornOptions = [
 const fetchRssSourceOptions = async () => {
   const response = await rssController.findAllRss();
   rssSourceUrl.value = response;
-  const options = response.map((item) => {
+  rssSourceUrlOptions.value = response.map((item) => {
     return {
       label: `${item.sourceUrl} / ${item.customName}`,
       value: item.sourceUrl,
       key: item.id,
     };
   });
-  rssSourceUrlOptions.value = options;
 };
 
 const onSubmit = () => {

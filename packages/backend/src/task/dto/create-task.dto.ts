@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TaskDataWrapperDto } from './translate-task-data-wrapper.dto';
 
@@ -49,6 +49,7 @@ export class CreateTaskDto {
   })
   @ValidateNested() // 告诉 class-validator 需要验证嵌套对象
   @Type(() => TaskDataWrapperDto) // 将 taskData 转换为 TaskDataWrapperDto 对象
+  @IsOptional()
   readonly taskData: TaskDataWrapperDto;
 
   @ApiProperty({
