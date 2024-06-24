@@ -8,7 +8,7 @@ import { CommonModule } from './common/common.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TransformeredModule } from './transformered/transformered.module';
+import { TransformeredModule } from './transformed/transformed.module';
 
 @Module({
   imports: [

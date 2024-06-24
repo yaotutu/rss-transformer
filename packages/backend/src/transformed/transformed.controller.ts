@@ -1,9 +1,9 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { TransformeredService } from './transformered.service';
+import { TransformedService } from './transformed.service';
 
 @Controller('transformered')
 export class TransformeredController {
-  constructor(private readonly transformeredService: TransformeredService) {}
+  constructor(private readonly transformeredService: TransformedService) {}
   @Get()
   getHello(): string {
     return 'Hello from TransformeredController';
@@ -11,6 +11,6 @@ export class TransformeredController {
 
   @Get(':id')
   getTransformered(@Param('id', ParseIntPipe) id: number) {
-    return this.transformeredService.generateTransformeredByTaskId(id);
+    return this.transformeredService.generateTransformedByTaskId(id);
   }
 }

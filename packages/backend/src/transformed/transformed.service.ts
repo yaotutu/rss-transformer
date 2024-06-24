@@ -4,13 +4,13 @@ import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { JsonToXmlService } from 'src/common/rss-parser/json-to-xml.service';
 
 @Injectable()
-export class TransformeredService {
+export class TransformedService {
   constructor(
     private readonly rssPrismaService: RssPrismaService,
     private readonly jsonToXmlService: JsonToXmlService,
   ) {}
 
-  async generateTransformeredByTaskId(
+  async generateTransformedByTaskId(
     id: number,
   ): Promise<ApiResponse<string>> {
     const { rssJson, feedType } =
