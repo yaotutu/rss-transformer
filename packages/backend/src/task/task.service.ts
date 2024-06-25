@@ -50,12 +50,13 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       name,
       schedule,
       taskType,
-      functionName,
       rssSourceId,
       immediate = false,
       rssSourceUrl,
     } = createTaskDto;
-    const taskData = createTaskDto.taskData || taskMapping[taskType];
+    const taskData = createTaskDto.taskData || taskMapping[taskType].taskData;
+    const functionName = taskMapping[taskType].functionName;
+    console.log('first');
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
@@ -143,13 +144,18 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
         'TASK',
         `Job ${jobName} already exists, skipping addition.`,
       );
-      return;
+      return '任务已经存在了';
     }
 
     // Callback function for the cron job
     const jobCallback = async () => {
       this.winstonService.debug('TASK', `Running task: ${task.name}`);
-      const data = JSON.parse(task.taskData); // Parse task data
+      // 执行xxx任务携带的必要信息
+      const data = {
+        taskData: JSON.parse(task.taskData),
+        taskType: task.taskType,
+      };
+      // const data = JSON.parse(task.taskData); // Parse task data
 
       // Retrieve the task instance from registry and execute
       const taskInstance = this.taskRegistry.getTask(task.functionName);

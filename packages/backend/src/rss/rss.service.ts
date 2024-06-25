@@ -13,19 +13,11 @@ import { RssParserService } from 'src/common/rss-parser/rss-parser.service';
 
 @Injectable()
 export class RssService {
-  private parser: Parser<any, any>;
   constructor(
     private winstonService: WinstonService,
     private rssPrismaService: RssPrismaService,
     private rssParserService: RssParserService,
-  ) {
-    this.parser = new Parser({
-      headers: { Accept: 'application/rss+xml, text/xml; q=0.1' },
-      xml2js: {
-        explicitArray: false, // Ensure that repeated elements are not overwritten
-      },
-    });
-  }
+  ) {}
 
   getAllRssSources() {
     return this.rssPrismaService.getAllRssSources();
@@ -76,15 +68,29 @@ export class RssService {
       });
       let organizedItem = [];
       if (feedType === 'atom') {
-        organizedItem = items.map((item) => ({
-          rssSourceId: id,
-          itemUrl: item.link.$.href,
-          itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
-          uniqueArticleId: this.generateUniqueArticleId(
-            item.link.$.href,
-            item.content._,
-          ),
-        }));
+        organizedItem = items.map((item) => {
+          let linkHref = '';
+
+          // 如果 item.link 是数组，找到第一个具有 href 属性的对象
+          if (Array.isArray(item.link)) {
+            const linkWithHref = item.link.find(
+              (link) => link && link.$ && link.$.href,
+            );
+            linkHref = linkWithHref ? linkWithHref.$.href : '';
+          } else if (item.link && item.link.$ && item.link.$.href) {
+            // 否则直接取 item.link.$.href
+            linkHref = item.link.$.href;
+          }
+          return {
+            rssSourceId: id,
+            itemUrl: linkHref,
+            itemOriginInfo: JSON.stringify(item), // Assuming itemOriginInfo is a JSON string
+            uniqueArticleId: this.generateUniqueArticleId(
+              linkHref,
+              item.content ? item.content._ : '',
+            ),
+          };
+        });
       } else {
         organizedItem = items.map((item) => ({
           rssSourceId: id,

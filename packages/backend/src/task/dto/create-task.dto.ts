@@ -29,13 +29,6 @@ export class CreateTaskDto {
   readonly taskType: string;
 
   @ApiProperty({
-    description: '要调用的函数名称',
-    example: 'updateItem',
-  })
-  @IsNotEmpty()
-  readonly functionName: string;
-
-  @ApiProperty({
     description: '任务的数据或配置信息，可以是 JSON 字符串',
     example: {
       taskType: 'TRANSLATE',

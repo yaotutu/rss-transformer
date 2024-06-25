@@ -20,10 +20,20 @@ export class GenericLlmTask implements Task {
     rssSourceUrl: string,
     taskId: number,
   ): Promise<void> {
-    const taskData = JSON.parse(data);
-    const { taskType } = taskData;
-    if (taskType === 'translate') {
-      const taskFn = this.langChainService.translateSingleParagraph;
+    const { taskData, taskType } = data;
+    // const taskData = data;
+    // const { taskType } = taskData;
+    let handleTaskExecution: (content: string) => Promise<string>;
+
+    if (taskType === 'TRANSLATE') {
+      const { originLang, targetLang } = taskData;
+      handleTaskExecution = async (data: string) => {
+        return this.langChainService.translateSingleParagraph(
+          data,
+          originLang,
+          targetLang,
+        );
+      };
     }
     // 这里拿到的是去重过的数据，直接处理就好，不用关心是否重复
     const rssItems = await this.rssPrismaService.getUniqueRssItems(
@@ -45,11 +55,15 @@ export class GenericLlmTask implements Task {
         }
 
         let rssItemInfo = JSON.parse(item.itemOriginInfo);
+        const transedContent = rssItemInfo[defaultConetentTag];
+        let finalContent = '';
+        if (typeof transedContent === 'string') {
+          finalContent = transedContent;
+        } else {
+          finalContent = transedContent._;
+        }
         // rssItemInfo.content._ = 'helloworld！';
-        const transedString =
-          await this.langChainService.translateSingleParagraph(
-            rssItemInfo[defaultConetentTag],
-          );
+        const transedString = await handleTaskExecution(finalContent);
         // 修改标签内容
         rssItemInfo = this.modifyTagContent(
           rssItemInfo,
