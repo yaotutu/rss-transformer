@@ -63,8 +63,8 @@
           placeholder="是否立即执行"
           style="width: 180px"
         >
-          <el-option key="1" label="是" value="true"></el-option>
-          <el-option key="0" label="否" value="false"></el-option>
+          <el-option key="1" label="是" :value="true"></el-option>
+          <el-option key="0" label="否" :value="false"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
@@ -103,7 +103,7 @@ const taskForm = reactive({
   taskType: '',
   functionName: '',
   taskData: '',
-  immediate: '',
+  immediate: false,
 });
 
 const handleTaskSubmit = () => {
