@@ -10,6 +10,7 @@
     "bdebug": "pnpm run --prefix packages/backend start:debug",
     "bm": "pnpm run --prefix packages/backend migrate",
     "bg": "pnpm run --prefix packages/backend generate",
-    "fdev": "pnpm run --prefix packages/frontend dev"
+    "fdev": "pnpm run --prefix packages/frontend dev",
+    "dev": "pnpm run bdebug && pnpm run fdev"
   }
 }
