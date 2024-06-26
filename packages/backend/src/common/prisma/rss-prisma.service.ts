@@ -8,8 +8,8 @@ import {
 import { WinstonService } from '../logger/winston.service';
 import { ApiResponse } from '../dto/common.dto';
 import { BasePrismaService } from './base-prisma.service';
-import { ErrorHandlingService } from '../error-handling/error-handling.service';
 import { OmitMultiple } from 'src/types';
+import { ErrorHandlingService } from '../exceptions/error-handling.service';
 
 /**
  * Service for interacting with Prisma client to manage RSS sources and items.
@@ -19,7 +19,7 @@ export class RssPrismaService extends BasePrismaService {
   constructor(
     prisma: PrismaClient,
     protected winstonService: WinstonService,
-    protected errorHandlingService: ErrorHandlingService,
+    errorHandlingService: ErrorHandlingService,
   ) {
     super(prisma, winstonService, errorHandlingService);
   }
@@ -44,7 +44,6 @@ export class RssPrismaService extends BasePrismaService {
       return rssSource;
     } catch (error) {
       this.handlePrismaError(
-        'DATABASE',
         `Failed to retrieve RSS source with ID ${rssSourceId}.`,
         error,
       );
@@ -71,7 +70,7 @@ export class RssPrismaService extends BasePrismaService {
     });
 
     if (existingRssSource) {
-      this.handlePrismaError('DATABASE', 'RSS source already exists.', null);
+      this.handlePrismaError('RSS source already exists.', null, true);
     }
 
     // Create a new RSS source
@@ -87,15 +86,11 @@ export class RssPrismaService extends BasePrismaService {
    * Retrieves all RSS sources.
    * @returns {Promise<RssSource[] | ApiResponse<string>>} - A list of RSS sources or an ApiResponse with error message.
    */
-  async getAllRssSources(): Promise<RssSource[] | ApiResponse<string>> {
+  async getAllRssSources(): Promise<RssSource[]> {
     try {
       return await this.prisma.rssSource.findMany();
     } catch (error) {
-      this.handlePrismaError(
-        'DATABASE',
-        'Failed to fetch all RSS sources.',
-        error,
-      );
+      this.handlePrismaError('Failed to fetch all RSS sources.', error);
     }
   }
 
@@ -205,7 +200,6 @@ export class RssPrismaService extends BasePrismaService {
       return rssItems;
     } catch (error) {
       this.handlePrismaError(
-        'DATABASE',
         `Failed to retrieve RSS items for source with ID ${rssSourceId}.`,
         error,
       );
@@ -261,7 +255,6 @@ export class RssPrismaService extends BasePrismaService {
       );
     } catch (error) {
       this.handlePrismaError(
-        'DATABASE',
         '对比 RssItem 和 RssTransformed 数据时出错。',
         error,
       );
@@ -362,7 +355,6 @@ export class RssPrismaService extends BasePrismaService {
       }
     } catch (error) {
       this.handlePrismaError(
-        'DATABASE',
         `Failed to retrieve RssTransformed items with origin info for task ID ${taskId}.`,
         error,
       );

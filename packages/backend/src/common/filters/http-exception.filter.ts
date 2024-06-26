@@ -7,10 +7,13 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiException } from '../dto/common.dto';
+import {
+  UserFacingException,
+  InternalException,
+} from '../exceptions/custom-exceptions';
 import { ValidationError } from 'class-validator';
 
-@Catch(HttpException) // 捕获所有 HttpException 类型的异常
+@Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -25,11 +28,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message: any = exception.message || 'Bad Request Exception';
     let errorResponse: any;
 
-    // 处理自定义的 ApiException 类型的异常
-    if (exception instanceof ApiException) {
+    // 处理自定义的 UserFacingException 类型的异常
+    if (exception instanceof UserFacingException) {
       message = exception.message;
       errorResponse = {
-        statusCode: status,
+        statusCode: exception.statusCode,
+        message: message,
+      };
+    }
+    // 处理自定义的 InternalException 类型的异常
+    else if (exception instanceof InternalException) {
+      message = 'An internal error occurred. Please try again later.';
+      errorResponse = {
+        statusCode: exception.statusCode,
         message: message,
       };
     }

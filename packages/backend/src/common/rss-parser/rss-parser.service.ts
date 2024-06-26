@@ -1,8 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as xml2js from 'xml2js';
-import { ErrorHandlingService } from '../error-handling/error-handling.service';
 import { LogType } from 'src/types';
 import * as iconv from 'iconv-lite';
+import { ErrorHandlingService } from '../exceptions/error-handling.service';
 
 @Injectable()
 export class RssParserService {
@@ -190,6 +190,6 @@ export class RssParserService {
    */
   protected handleRssParsingError(message: string, error: any): void {
     const source: LogType = 'PARSER_RSS_TO_JSON'; // Set the appropriate log type
-    this.errorHandlingService.handleError(source, message, error);
+    this.errorHandlingService.handleError(source, message, error, false);
   }
 }

@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { BasePrismaService } from './base-prisma.service';
 import { Task as DbTask, PrismaClient, RssItem } from '@prisma/client';
 import { WinstonService } from '../logger/winston.service';
-import { ErrorHandlingService } from '../error-handling/error-handling.service';
+import { ErrorHandlingService } from '../exceptions/error-handling.service';
 
 @Injectable()
 export class TaskPrismaService extends BasePrismaService {
@@ -39,7 +39,7 @@ export class TaskPrismaService extends BasePrismaService {
         },
       });
     } catch (error) {
-      this.handlePrismaError('DATABASE', '创建任务失败', error);
+      this.handlePrismaError('创建任务失败', error);
     }
   }
 
@@ -47,7 +47,7 @@ export class TaskPrismaService extends BasePrismaService {
     try {
       return await this.prisma.task.findUnique({ where: { name } });
     } catch (error) {
-      this.handlePrismaError('DATABASE', 'Failed to get task by name', error);
+      this.handlePrismaError('Failed to get task by name', error);
     }
   }
 
@@ -55,7 +55,7 @@ export class TaskPrismaService extends BasePrismaService {
     try {
       return await this.prisma.task.findMany();
     } catch (error) {
-      this.handlePrismaError('DATABASE', 'Failed to fetch all tasks', error);
+      this.handlePrismaError('Failed to fetch all tasks', error);
     }
   }
 
@@ -66,7 +66,7 @@ export class TaskPrismaService extends BasePrismaService {
         data: { status },
       });
     } catch (error) {
-      this.handlePrismaError('DATABASE', 'Failed to update task status', error);
+      this.handlePrismaError('Failed to update task status', error);
     }
   }
 
@@ -82,7 +82,6 @@ export class TaskPrismaService extends BasePrismaService {
       });
     } catch (error) {
       this.handlePrismaError(
-        'DATABASE',
         'Failed to update task status and immediate flag',
         error,
       );

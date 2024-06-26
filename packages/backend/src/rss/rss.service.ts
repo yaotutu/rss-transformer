@@ -1,15 +1,10 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
-import { CreateRssDto } from './dto/create-rss.dto';
-import * as Parser from 'rss-parser';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { WinstonService } from 'src/common/logger/winston.service';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { RssParserService } from 'src/common/rss-parser/rss-parser.service';
+import { CreateRssDto } from './dto/create-rss.dto';
+import { RssSource } from '@prisma/client';
 
 @Injectable()
 export class RssService {
@@ -19,22 +14,27 @@ export class RssService {
     private rssParserService: RssParserService,
   ) {}
 
-  getAllRssSources() {
+  /**
+   * Retrieves all RSS sources.
+   * @returns {Promise<RssSource[]>} - A promise that resolves to an array of RSS sources.
+   */
+  getAllRssSources(): Promise<RssSource[]> {
     return this.rssPrismaService.getAllRssSources();
   }
 
-  async create(_createRssDto: CreateRssDto) {
+  /**
+   * Creates a new RSS source.
+   * @param {CreateRssDto} _createRssDto - The DTO containing the source URL and custom name.
+   * @returns {Promise<string>} - A message indicating the creation status.
+   * @throws {ServiceUnavailableException} - If an error occurs while creating the RSS source.
+   */
+  async create(_createRssDto: CreateRssDto): Promise<string> {
     const { sourceUrl, customName } = _createRssDto;
-    try {
-      const rssSourceItem = await this.rssPrismaService.createRssSource({
-        sourceUrl: sourceUrl,
-        customName: customName,
-      });
-      return await this.updateItemByRssSourceID(rssSourceItem.id);
-    } catch (error) {
-      this.winstonService.error('ADD_RSS_SOURCE', '添加RSS源时出错', error);
-      throw new ServiceUnavailableException(error.message);
-    }
+    const rssSourceItem = await this.rssPrismaService.createRssSource({
+      sourceUrl: sourceUrl,
+      customName: customName,
+    });
+    return this.updateItemByRssSourceID(rssSourceItem.id);
   }
 
   /**
