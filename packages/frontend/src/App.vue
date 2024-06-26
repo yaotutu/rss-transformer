@@ -15,24 +15,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { rssController } from './services/api';
 import AddRssSource from './components/AddRssSource.vue';
 import RssSourceTable from './components/RssSourceTable.vue';
 import AddTask from './components/AddTask.vue';
 
 const rssSourceUrl = ref([]);
-const rssSourceUrlOptions = ref([]);
+let rssSourceUrlOptions = reactive([]);
+let rssItemTagOptions = reactive([]);
 
 const fetchRssSourceOptions = async () => {
   const response = await rssController.findAllRss();
   rssSourceUrl.value = response;
-  rssSourceUrlOptions.value = response.map((item) => ({
+  rssSourceUrlOptions = response.map((item) => ({
     label: `${item.sourceUrl} / ${item.customName}`,
     value: item.sourceUrl,
     key: item.id,
     sourceUrl: item.sourceUrl,
     rssSourceId: item.id,
+    rssItemTag: JSON.parse(item.rssItemTag),
   }));
 };
 

@@ -27,7 +27,21 @@
           />
         </el-select>
       </el-form-item>
-
+      <el-form-item>
+        <el-select
+          v-model="taskForm.rssItemTag"
+          placeholder="选择要处理的rss tag"
+          style="width: 180px"
+          multiple
+        >
+          <el-option
+            v-for="(option, index) in rssItemTagOptions"
+            :key="index"
+            :label="option"
+            :value="option"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-select
           v-model="taskForm.schedule"
@@ -74,9 +88,17 @@
 
 <script setup>
 import { taskController } from '@/services/api';
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 const props = defineProps({
   rssSourceUrlOptions: Array,
+});
+
+const rssItemTagOptions = computed(() => {
+  if (taskForm.rssSourceUrl) {
+    return props.rssSourceUrlOptions.find(
+      (item) => item.value === taskForm.rssSourceUrl,
+    ).rssItemTag;
+  }
 });
 
 const taskCornOptions = [
@@ -104,10 +126,10 @@ const taskForm = reactive({
   functionName: '',
   taskData: '',
   immediate: false,
+  rssItemTag: [],
 });
 
 const handleTaskSubmit = () => {
-  console.log('rssSourceUrlOptions', props.rssSourceUrlOptions);
   const { rssSourceUrl, name, schedule, taskType, functionName, immediate } =
     taskForm;
   const rssSourceId = props.rssSourceUrlOptions.find(
