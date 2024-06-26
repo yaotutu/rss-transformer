@@ -15,6 +15,7 @@ model RssSource {
   rssOriginInfo  String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
   feedType       String? // RSS 类型 atom/rss
   xmlDeclaration String? // xml声明
+  rssItemTag     String? // RSS item 标签,保证task任务需要处理的标签都是存在的.
   createdAt      DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt      DateTime @updatedAt // 更新时间戳
 
