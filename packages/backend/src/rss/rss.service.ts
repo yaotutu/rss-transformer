@@ -5,6 +5,7 @@ import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { RssParserService } from 'src/common/rss-parser/rss-parser.service';
 import { CreateRssDto } from './dto/create-rss.dto';
 import { RssSource } from '@prisma/client';
+import { InternalException } from 'src/common/exceptions/custom-exceptions';
 
 @Injectable()
 export class RssService {
@@ -34,7 +35,7 @@ export class RssService {
       sourceUrl: sourceUrl,
       customName: customName,
     });
-    return this.updateItemByRssSourceID(rssSourceItem.id);
+    return this.updateRssData(rssSourceItem.id);
   }
 
   /**
@@ -54,17 +55,21 @@ export class RssService {
    * @param {number} id - The ID of the RSS source.
    * @returns {Promise<string>} - A message indicating the update status.
    */
-  async updateItemByRssSourceID(id: number): Promise<string> {
+  async updateRssData(id: number): Promise<string> {
     try {
       const rssSource = await this.rssPrismaService.getRssSourceById(id);
       const parsedUrl = await this.rssParserService.parseUrl(
         rssSource.sourceUrl,
       );
       const { feedInfo, items, feedType, xmlDeclaration } = parsedUrl;
-
+      if (items.length === 0) {
+        throw new InternalException(500, '没有可用的rss item数据');
+      }
+      const rssItemTag = this.getFirstLevelKeys(items[0]);
       this.rssPrismaService.updateRssSource(id, {
         rssOriginInfo: JSON.stringify(feedInfo),
         feedType,
+        rssItemTag: JSON.stringify(rssItemTag),
       });
       let organizedItem = [];
       if (feedType === 'atom') {
@@ -129,7 +134,16 @@ export class RssService {
     }
   }
 
+  /**
+   * 获取一个对象的第一层 key
+   * @param obj  一个对象
+   * @returns  返回对象的第一层 key
+   */
+  getFirstLevelKeys(obj: object): string[] {
+    return Object.keys(obj);
+  }
+
   async test() {
-    return await this.updateItemByRssSourceID(7);
+    return await this.updateRssData(7);
   }
 }
