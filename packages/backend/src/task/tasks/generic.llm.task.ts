@@ -20,13 +20,13 @@ export class GenericLlmTask implements Task {
     rssSourceUrl: string,
     taskId: number,
   ): Promise<void> {
-    const { taskData, taskType } = data;
-    // const taskData = data;
-    // const { taskType } = taskData;
+    // const { taskData, taskType } = data;
+    const taskInfo = await this.taskPrismaService.getTaskById(taskId);
+    const { taskData, taskType, rssItemTag } = taskInfo;
     let handleTaskExecution: (content: string) => Promise<string>;
 
     if (taskType === 'TRANSLATE') {
-      const { originLang, targetLang } = taskData;
+      const { originLang, targetLang } = JSON.parse(taskData);
       handleTaskExecution = async (data: string) => {
         return this.langChainService.translateSingleParagraph(
           data,
@@ -41,34 +41,30 @@ export class GenericLlmTask implements Task {
       rssSourceUrl,
     );
 
+    // 如果没有数据，直接返回
     if (rssItems.length === 0) {
       return;
     }
     const rssTransformedItems = await Promise.all(
       rssItems.map(async (item) => {
-        const { feedType } = item;
-        let defaultConetentTag = '';
-        if (feedType === 'rss2') {
-          defaultConetentTag = 'description';
-        } else {
-          defaultConetentTag = 'content';
-        }
-
+        const rssItemTagList = JSON.parse(rssItemTag);
         let rssItemInfo = JSON.parse(item.itemOriginInfo);
-        const transedContent = rssItemInfo[defaultConetentTag];
-        let finalContent = '';
-        if (typeof transedContent === 'string') {
-          finalContent = transedContent;
-        } else {
-          finalContent = transedContent._;
-        }
-        // rssItemInfo.content._ = 'helloworld！';
-        const transedString = await handleTaskExecution(finalContent);
-        // 修改标签内容
-        rssItemInfo = this.modifyTagContent(
-          rssItemInfo,
-          defaultConetentTag,
-          transedString,
+        await Promise.all(
+          rssItemTagList.map(async (tag) => {
+            const transedContent = rssItemInfo[tag];
+            let finalContent = '';
+            if (typeof transedContent === 'string') {
+              finalContent = transedContent;
+            } else {
+              finalContent = transedContent._;
+            }
+            const transedString = await handleTaskExecution(finalContent);
+            rssItemInfo[tag] = this.modifyTagContent(
+              rssItemInfo,
+              tag,
+              transedString,
+            );
+          }),
         );
         return {
           rssItemId: item.id,

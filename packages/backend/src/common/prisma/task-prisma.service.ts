@@ -1,9 +1,9 @@
 // src/common/prisma/task-prisma.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { BasePrismaService } from './base-prisma.service';
-import { Task as DbTask, PrismaClient, RssItem } from '@prisma/client';
-import { WinstonService } from '../logger/winston.service';
+import { Injectable } from '@nestjs/common';
+import { Task as DbTask, PrismaClient } from '@prisma/client';
 import { ErrorHandlingService } from '../exceptions/error-handling.service';
+import { WinstonService } from '../logger/winston.service';
+import { BasePrismaService } from './base-prisma.service';
 
 @Injectable()
 export class TaskPrismaService extends BasePrismaService {
@@ -20,10 +20,11 @@ export class TaskPrismaService extends BasePrismaService {
     schedule: string,
     taskType: string,
     functionName: string,
-    taskData: any,
+    taskData: JSON,
     rssSourceId?: number,
     immediate?: boolean,
     rssSourceUrl?: string,
+    rssItemTag?: JSON,
   ): Promise<DbTask> {
     try {
       return await this.prisma.task.create({
@@ -36,6 +37,7 @@ export class TaskPrismaService extends BasePrismaService {
           rssSourceId,
           immediate,
           rssSourceUrl,
+          rssItemTag: JSON.stringify(rssItemTag),
         },
       });
     } catch (error) {
@@ -96,5 +98,13 @@ export class TaskPrismaService extends BasePrismaService {
     return this.prisma.rssTransformed.findMany({
       where: { taskId },
     });
+  }
+
+  async getTaskById(taskId: number): Promise<DbTask> {
+    try {
+      return await this.prisma.task.findUnique({ where: { id: taskId } });
+    } catch (error) {
+      this.handlePrismaError('Failed to get task by id', error, false);
+    }
   }
 }

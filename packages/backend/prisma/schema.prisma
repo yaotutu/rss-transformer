@@ -60,6 +60,7 @@ model Task {
   name         String   @unique // 任务名称，用于标识任务，也是生成rss的url的一部分，必须唯一
   schedule     String // 定时任务的调度规则，可以用字符串存储 cron 表达式或类似格式
   taskType     String // 任务类型，例如：rss的翻译、rss的总结
+  rssItemTag   String? // 需要进行处理的标签
   functionName String // 要调用的函数名称
   taskData     String // 任务的数据或配置信息，可以是 JSON 字符串
   createdAt    DateTime @default(now()) // 创建时间，默认为当前时间

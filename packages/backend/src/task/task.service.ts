@@ -53,10 +53,11 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       rssSourceId,
       immediate = false,
       rssSourceUrl,
+      rssItemTag,
     } = createTaskDto;
     const taskData = createTaskDto.taskData || taskMapping[taskType].taskData;
     const functionName = taskMapping[taskType].functionName;
-    console.log('first');
+
     try {
       // Check if task with the same name already exists
       const existingTask = await this.taskPrismaService.getTaskByName(name);
@@ -78,6 +79,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
         rssSourceId,
         immediate,
         rssSourceUrl,
+        rssItemTag,
       );
 
       // Add the cron job for the task
@@ -85,7 +87,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
       return task;
     } catch (error) {
-      this.handleError('TASK', 'Failed to create task', error);
+      this.handleError('TASK', 'Failed to create task 😭', error);
       return error.message || 'Failed to create task';
     }
   }

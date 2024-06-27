@@ -10,8 +10,8 @@ export class TaskController {
     private readonly langchainService: LangchainService,
   ) {}
   @Post()
-  async createTask(@Body() createTaskDto: CreateTaskDto) {
-    return await this.taskService.createTask(createTaskDto);
+  createTask(@Body() createTaskDto: CreateTaskDto) {
+    return this.taskService.createTask(createTaskDto);
   }
 
   @Post('hello')

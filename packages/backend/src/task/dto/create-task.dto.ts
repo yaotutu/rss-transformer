@@ -65,4 +65,11 @@ export class CreateTaskDto {
   })
   @IsNotEmpty()
   readonly rssSourceUrl: string;
+
+  @ApiProperty({
+    description: 'RSS 项的标签',
+    example: '["summary","content"]',
+  })
+  @IsOptional()
+  readonly rssItemTag: JSON;
 }
