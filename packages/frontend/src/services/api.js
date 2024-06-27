@@ -16,7 +16,7 @@ const rssController = {
 
 const taskController = {
   createTask: (data) => request('/task', 'POST', data),
-  getTaskHello: () => request('/task', 'GET'),
+  getAllTask: () => request('/task', 'GET'),
   sayTaskHello: () => request('/task/hello', 'POST'),
 };
 
