@@ -33,6 +33,8 @@
           placeholder="选择要处理的rss tag"
           style="width: 180px"
           multiple
+          collapse-tags
+          clearable
         >
           <el-option
             v-for="(option, index) in rssItemTagOptions"
@@ -130,12 +132,20 @@ const taskForm = reactive({
 });
 
 const handleTaskSubmit = () => {
-  const { rssSourceUrl, name, schedule, taskType, functionName, immediate } =
-    taskForm;
+  let {
+    rssSourceUrl,
+    name,
+    schedule,
+    taskType,
+    functionName,
+    immediate,
+    rssItemTag,
+  } = taskForm;
+
   const rssSourceId = props.rssSourceUrlOptions.find(
     (item) => item.value === rssSourceUrl,
   ).key;
-
+  // console.log(rssItemTag, 'rssItemTag');
   taskController.createTask({
     rssSourceUrl,
     rssSourceId,
@@ -144,6 +154,7 @@ const handleTaskSubmit = () => {
     taskType,
     functionName,
     immediate,
+    rssItemTag,
   });
   emit('taskAdded');
 };
