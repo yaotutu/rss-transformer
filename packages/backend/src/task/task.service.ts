@@ -1,19 +1,16 @@
 // src/task/task.service.ts
 
-import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { SchedulerRegistry } from "@nestjs/schedule";
+import { Task as DbTask } from "@prisma/client";
 import { CronJob } from "cron";
+import { ErrorHandlingService } from "src/common/exceptions/error-handling.service";
+import { ApiException } from "../common/dto/common.dto";
+import { WinstonService } from "../common/logger/winston.service";
 import { TaskPrismaService } from "../common/prisma/task-prisma.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
-import { WinstonService } from "../common/logger/winston.service";
-import { LogType } from "../types";
-import { TaskRegistry } from "./task.registry";
-import { ApiException } from "../common/dto/common.dto";
-import { Task as DbTask } from "@prisma/client";
 import { taskMapping } from "./task-mapping";
-import { ErrorHandlingService } from "src/common/exceptions/error-handling.service";
-import { error } from "console";
-import { async } from "rxjs";
+import { TaskRegistry } from "./task.registry";
 
 @Injectable()
 export class TaskService implements OnModuleInit, OnModuleDestroy {
@@ -33,10 +30,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 		try {
 			await this.syncTasks(); // Synchronize tasks on module initialization
 		} catch (error) {
-			this.handleError(
-				"Failed to synchronize tasks on module init",
-				error,
-			);
+			this.handleError("Failed to synchronize tasks on module init", error);
 		}
 	}
 
@@ -88,21 +82,25 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
 			return task;
 		} catch (error) {
-			this.handleError( "Failed to create task 😭", error);
+			this.handleError("Failed to create task 😭", error);
 			return error.message || "Failed to create task";
 		}
 	}
 
 	updateTask(id: number, updateTaskDto: CreateTaskDto) {
 		if (isNaN(id)) {
-			this.handleError( "Failed to update task", "id is not a number");
+			this.handleError("Failed to update task", "id is not a number");
 		}
-		const data = {
-			...updateTaskDto,
-			rssItemTag: JSON.stringify(updateTaskDto.rssItemTag),
-			taskData: JSON.stringify(updateTaskDto.taskData),
-		};
-		this.taskPrismaService.updateTask(id, data);
+		try {
+			const data = {
+				...updateTaskDto,
+				rssItemTag: JSON.stringify(updateTaskDto.rssItemTag),
+				taskData: JSON.stringify(updateTaskDto.taskData),
+			};
+			return this.taskPrismaService.updateTask(id, data);
+		} catch (error) {
+			this.handleError("updateTask is faled", error);
+		}
 	}
 
 	// Endpoint to fetch all tasks
@@ -110,7 +108,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 		try {
 			return await this.taskPrismaService.getAllTasks();
 		} catch (error) {
-			this.handleError( "Failed to fetch all tasks", error);
+			this.handleError("Failed to fetch all tasks", error);
 			return [];
 		}
 	}
@@ -144,7 +142,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 				}
 			}
 		} catch (error) {
-			this.handleError( "Failed to synchronize tasks", error);
+			this.handleError("Failed to synchronize tasks", error);
 		}
 	}
 
@@ -178,7 +176,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 				try {
 					await taskInstance.execute(data, rssSourceId, rssSourceUrl, id); // Execute task
 				} catch (error) {
-					this.handleError( "Failed to execute task", error);
+					this.handleError("Failed to execute task", error);
 				}
 			} else {
 				this.winstonService.error("TASK", `Unknown task: ${task.functionName}`);
@@ -239,7 +237,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 		} catch (error) {
 			// Handle task execution failure
 			await this.taskPrismaService.updateTaskStatus(task.id, "failed");
-			this.handleError( "Failed to execute immediate task", error);
+			this.handleError("Failed to execute immediate task", error);
 		}
 	}
 
@@ -258,11 +256,6 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 	private async updateScheduledJob(task: DbTask) {
 		await this.removeScheduledJob(task.id);
 		this.addCronJob(task, task.immediate);
-	}
-
-	// Error handling method
-	private handleError(message: string, error: any) {
-		this.errorHandlingService.handleError("TASK", message, error);
 	}
 
 	// Method to clear all scheduled jobs
@@ -285,5 +278,13 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 				);
 			}
 		});
+	}
+	// Error handling method
+	private handleError(
+		message: string,
+		error: any,
+		isUserFacing: boolean = false,
+	) {
+		this.errorHandlingService.handleError("TASK", message, error, isUserFacing);
 	}
 }

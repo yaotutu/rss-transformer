@@ -9,11 +9,14 @@
 
     <el-divider />
 
-    <el-form :inline="true" :model="taskForm" class="">
-      <el-form-item>
-        <el-input v-model="taskForm.name" placeholder="任务名称" />
+    <el-form :inline="true" :model="taskForm" class="" label-position="top">
+      <el-form-item label="任务名称">
+        <el-input
+          v-model="taskForm.name"
+          placeholder="可以用于获取最后生成的rss"
+        />
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="rss源">
         <el-select
           v-model="taskForm.rssSourceUrl"
           placeholder="请选择rss源"
@@ -27,7 +30,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="tag">
         <el-select
           v-model="taskForm.rssItemTag"
           placeholder="选择要处理的rss tag"
@@ -44,7 +47,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="任务间隔">
         <el-select
           v-model="taskForm.schedule"
           placeholder="选择任务执行周期"
@@ -59,7 +62,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item label="任务类型">
         <el-select
           v-model="taskForm.taskType"
           placeholder="选择任务类型"
@@ -70,10 +73,11 @@
             label="翻译任务"
             value="TRANSLATE"
           ></el-option>
+          <el-option key="CUSTOM" label="自定义任务" value="CUSTOM"></el-option>
         </el-select>
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item label="立即执行">
         <el-select
           v-model="taskForm.immediate"
           placeholder="是否立即执行"
@@ -83,8 +87,18 @@
           <el-option key="0" label="否" :value="false"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="任务数据">
+        <el-input
+          v-model="taskForm.taskData"
+          placeholder="接受一个json字符串"
+        />
+      </el-form-item>
+      <el-form-item label="id">
+        <el-input v-model="taskForm.id" placeholder="从任务列表中获取" />
+      </el-form-item>
     </el-form>
-    <el-button @click="handleTaskSubmit">添加任务</el-button>
+    <el-button @click="handleTaskSubmit('add')">添加任务</el-button>
+    <el-button @click="handleTaskSubmit('edit')">修改任务</el-button>
   </div>
 </template>
 
@@ -120,6 +134,7 @@ const taskCornOptions = [
 const emit = defineEmits(['taskAdded']);
 
 const taskForm = reactive({
+  id: '',
   rssSourceUrl: '',
   rssSourceId: '',
   name: '',
@@ -127,11 +142,11 @@ const taskForm = reactive({
   taskType: '',
   functionName: '',
   taskData: '',
-  immediate: false,
+  immediate: undefined,
   rssItemTag: [],
 });
 
-const handleTaskSubmit = () => {
+const handleTaskSubmit = (action) => {
   let {
     rssSourceUrl,
     name,
@@ -145,17 +160,30 @@ const handleTaskSubmit = () => {
   const rssSourceId = props.rssSourceUrlOptions.find(
     (item) => item.value === rssSourceUrl,
   ).key;
-  // console.log(rssItemTag, 'rssItemTag');
-  taskController.createTask({
-    rssSourceUrl,
-    rssSourceId,
-    name,
-    schedule,
-    taskType,
-    functionName,
-    immediate,
-    rssItemTag,
-  });
+  if (action === 'add') {
+    taskController.updateTask({
+      rssSourceUrl,
+      rssSourceId,
+      name,
+      schedule,
+      taskType,
+      functionName,
+      immediate,
+      rssItemTag,
+    });
+    return;
+  } else {
+    taskController.updateTask(taskForm.id, {
+      rssSourceUrl,
+      rssSourceId,
+      name,
+      schedule,
+      taskType,
+      functionName,
+      immediate,
+      rssItemTag,
+    });
+  }
   emit('taskAdded');
 };
 console.log('app task is loaded');

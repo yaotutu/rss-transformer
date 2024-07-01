@@ -16,18 +16,19 @@ const rssController = {
 
 const taskController = {
   createTask: (data) => request('/task', 'POST', data),
+  updateTask: (id, data) => request(`/task/${id}`, 'PUT', data),
   getAllTask: () => request('/task', 'GET'),
   sayTaskHello: () => request('/task/hello', 'POST'),
 };
 
-const transformeredController = {
-  getTransformeredHello: () => request('/transformered', 'GET'),
-  getTransformeredById: (id) => request(`/transformered/${id}`, 'GET'),
+const transformedController = {
+  gettransformedHello: () => request('/transformed', 'GET'),
+  gettransformedById: (id) => request(`/transformed/${id}`, 'GET'),
 };
 
 export {
   appController,
   rssController,
   taskController,
-  transformeredController,
+  transformedController,
 };

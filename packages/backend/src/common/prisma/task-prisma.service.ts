@@ -25,7 +25,7 @@ export class TaskPrismaService extends BasePrismaService {
 		rssSourceId?: number,
 		immediate?: boolean,
 		rssSourceUrl?: string,
-		rssItemTag?: string[]
+		rssItemTag?: string[],
 	): Promise<DbTask> {
 		try {
 			return await this.prisma.task.create({
@@ -46,11 +46,20 @@ export class TaskPrismaService extends BasePrismaService {
 		}
 	}
 
-	updateTask(id: number, data: Omit<Partial<DbTask>, "id">): Promise<DbTask> {
-		return this.prisma.task.update({
-			where: { id },
-			data,
-		});
+	async updateTask(
+		id: number,
+		data: Omit<Partial<DbTask>, "id">,
+	): Promise<DbTask> {
+		try {
+			const res = await this.prisma.task.update({
+				where: { id },
+				data,
+			});
+
+			return res;
+		} catch (error) {
+      this.handlePrismaError("更新任务失败", error,true);
+    }
 	}
 
 	async getTaskByName(name: string): Promise<DbTask> {
