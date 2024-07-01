@@ -8,7 +8,7 @@ async function bootstrap() {
     cors: true,
   });
   const config = new DocumentBuilder()
-    .setTitle('RSS Transformer API')
+    .setTitle('RSS Transformer API test')
     .setVersion('1.0')
     .addTag('rss', 'crud rss resource')
     .build();
@@ -16,6 +16,10 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Applicationbbbrunning on o ${await app.getUrl()}`);
+
+
+
 }
 bootstrap();
+

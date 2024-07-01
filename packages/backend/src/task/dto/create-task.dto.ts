@@ -71,5 +71,5 @@ export class CreateTaskDto {
     example: '["summary","content"]',
   })
   @IsOptional()
-  readonly rssItemTag: JSON;
+  readonly rssItemTag: string[];
 }
