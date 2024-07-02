@@ -17,6 +17,7 @@ const rssController = {
 const taskController = {
   createTask: (data) => request('/task', 'POST', data),
   updateTask: (id, data) => request(`/task/${id}`, 'PUT', data),
+  deleteTask: (id) => request(`/task/${id}`, 'DELETE'),
   getAllTask: () => request('/task', 'GET'),
   sayTaskHello: () => request('/task/hello', 'POST'),
 };
@@ -26,9 +27,4 @@ const transformedController = {
   gettransformedById: (id) => request(`/transformed/${id}`, 'GET'),
 };
 
-export {
-  appController,
-  rssController,
-  taskController,
-  transformedController,
-};
+export { appController, rssController, taskController, transformedController };

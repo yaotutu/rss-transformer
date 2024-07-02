@@ -93,12 +93,12 @@
           placeholder="接受一个json字符串"
         />
       </el-form-item>
-      <el-form-item label="id">
-        <el-input v-model="taskForm.id" placeholder="从任务列表中获取" />
-      </el-form-item>
+      <!-- <el-form-item label="id"> -->
+      <!--   <el-input v-model="taskForm.id" placeholder="从任务列表中获取" /> -->
+      <!-- </el-form-item> -->
     </el-form>
     <el-button @click="handleTaskSubmit('add')">添加任务</el-button>
-    <el-button @click="handleTaskSubmit('edit')">修改任务</el-button>
+    <!-- <el-button @click="handleTaskSubmit('edit')">修改任务</el-button> -->
   </div>
 </template>
 

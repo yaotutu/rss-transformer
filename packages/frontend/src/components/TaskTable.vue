@@ -46,6 +46,8 @@
 </template>
 
 <script setup>
+import { taskController } from '@/services/api';
+
 const props = defineProps({
   taskSource: {
     type: Array,
@@ -56,4 +58,9 @@ const props = defineProps({
     required: true,
   },
 });
+
+const handleTaskSourceDelete = (index, row) => {
+  console.log(row.id);
+  taskController.deleteTask([row.id]);
+};
 </script>
