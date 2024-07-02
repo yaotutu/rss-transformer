@@ -144,6 +144,7 @@ const taskForm = reactive({
   taskData: '',
   immediate: undefined,
   rssItemTag: [],
+  taskData: '{}',
 });
 
 const handleTaskSubmit = (action) => {
@@ -155,13 +156,19 @@ const handleTaskSubmit = (action) => {
     functionName,
     immediate,
     rssItemTag,
+    taskData,
   } = taskForm;
+
+  if (!isJsonString(taskData)) {
+    alert('任务数据必须是json字符串,必须包含functionName与taskData属性');
+    return;
+  }
 
   const rssSourceId = props.rssSourceUrlOptions.find(
     (item) => item.value === rssSourceUrl,
   ).key;
   if (action === 'add') {
-    taskController.updateTask({
+    taskController.createTask({
       rssSourceUrl,
       rssSourceId,
       name,
@@ -186,6 +193,20 @@ const handleTaskSubmit = (action) => {
   }
   emit('taskAdded');
 };
+
+// 校验json字符串的合法性
+// 必须包含functionName与taskData 属性
+function isJsonString(str) {
+  try {
+    const obj = JSON.parse(str);
+    if (obj.functionName && obj.taskData) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
 console.log('app task is loaded');
 </script>
 

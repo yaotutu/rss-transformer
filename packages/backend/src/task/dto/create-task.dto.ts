@@ -22,10 +22,10 @@ export class CreateTaskDto {
     description:
       '任务类型，例如：rss的翻译、rss的总结,"TRANSLATE" | "UPDATE_RSS_ITEMS"',
     example: 'TRANSLATE',
-    enum: ['TRANSLATE', 'UPDATE_RSS_ITEMS'],
+    enum: ['TRANSLATE', 'UPDATE_RSS_ITEMS', 'CUSTOM'],
   })
   @IsNotEmpty()
-  @IsIn(['TRANSLATE', 'UPDATE_RSS_ITEMS'])
+  @IsIn(['TRANSLATE', 'UPDATE_RSS_ITEMS', 'CUSTOM'])
   readonly taskType: string;
 
   @ApiProperty({

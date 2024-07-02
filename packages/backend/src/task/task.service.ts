@@ -1,16 +1,16 @@
 // src/task/task.service.ts
 
-import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { SchedulerRegistry } from "@nestjs/schedule";
-import { Task as DbTask } from "@prisma/client";
-import { CronJob } from "cron";
-import { ErrorHandlingService } from "src/common/exceptions/error-handling.service";
-import { ApiException } from "../common/dto/common.dto";
-import { WinstonService } from "../common/logger/winston.service";
-import { TaskPrismaService } from "../common/prisma/task-prisma.service";
-import { CreateTaskDto } from "./dto/create-task.dto";
-import { taskMapping } from "./task-mapping";
-import { TaskRegistry } from "./task.registry";
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { Task as DbTask } from '@prisma/client';
+import { CronJob } from 'cron';
+import { ErrorHandlingService } from 'src/common/exceptions/error-handling.service';
+import { ApiException } from '../common/dto/common.dto';
+import { WinstonService } from '../common/logger/winston.service';
+import { TaskPrismaService } from '../common/prisma/task-prisma.service';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { taskMapping } from './task-mapping';
+import { TaskRegistry } from './task.registry';
 
 @Injectable()
 export class TaskService implements OnModuleInit, OnModuleDestroy {
@@ -30,7 +30,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     try {
       await this.syncTasks(); // Synchronize tasks on module initialization
     } catch (error) {
-      this.handleError("Failed to synchronize tasks on module init", error);
+      this.handleError('Failed to synchronize tasks on module init', error);
     }
   }
 
@@ -50,6 +50,11 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       rssSourceUrl,
       rssItemTag,
     } = createTaskDto;
+    if (!createTaskDto.taskData || !taskMapping[taskType]) {
+      this.handleError('taskData or taskType is not provided', null, false);
+      // return "taskData or taskType is not provided";
+    }
+
     const taskData = createTaskDto.taskData || taskMapping[taskType].taskData;
     const functionName = taskMapping[taskType].functionName;
 
@@ -82,14 +87,14 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
       return task;
     } catch (error) {
-      this.handleError("Failed to create task 😭", error);
-      return error.message || "Failed to create task";
+      this.handleError('Failed to create task 😭', error);
+      return error.message || 'Failed to create task';
     }
   }
 
   updateTask(id: number, updateTaskDto: CreateTaskDto) {
     if (isNaN(id)) {
-      this.handleError("Failed to update task", "id is not a number");
+      this.handleError('Failed to update task', 'id is not a number');
     }
     try {
       const data = {
@@ -99,20 +104,20 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       };
       return this.taskPrismaService.updateTask(id, data);
     } catch (error) {
-      this.handleError("updateTask is faled", error);
+      this.handleError('updateTask is faled', error);
     }
   }
 
   // 删除任务
   async deleteTask(id: number) {
     if (isNaN(id)) {
-      this.handleError("Failed to delete task", "id is not a number");
+      this.handleError('Failed to delete task', 'id is not a number');
     }
     try {
       await this.removeScheduledJob(id); // Remove the scheduled job
       return this.taskPrismaService.deleteTask(id); // Delete the task from the database
     } catch (error) {
-      this.handleError("Failed to delete task", error, true);
+      this.handleError('Failed to delete task', error, true);
     }
   }
 
@@ -121,7 +126,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     try {
       return await this.taskPrismaService.getAllTasks();
     } catch (error) {
-      this.handleError("Failed to fetch all tasks", error);
+      this.handleError('Failed to fetch all tasks', error);
       return [];
     }
   }
@@ -150,12 +155,12 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
         }
 
         // Execute immediate task if needed
-        if (task.immediate && task.status === "pending") {
+        if (task.immediate && task.status === 'pending') {
           this.executeImmediateTask(task);
         }
       }
     } catch (error) {
-      this.handleError("Failed to synchronize tasks", error);
+      this.handleError('Failed to synchronize tasks', error);
     }
   }
 
@@ -165,17 +170,17 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     const jobName = `task_${task.id}`;
 
     // Check if the job already exists
-    if (this.schedulerRegistry.doesExist("cron", jobName)) {
+    if (this.schedulerRegistry.doesExist('cron', jobName)) {
       this.winstonService.warn(
-        "TASK",
+        'TASK',
         `Job ${jobName} already exists, skipping addition.`,
       );
-      return "任务已经存在了";
+      return '任务已经存在了';
     }
 
     // Callback function for the cron job
     const jobCallback = async () => {
-      this.winstonService.debug("TASK", `Running task: ${task.name}`);
+      this.winstonService.debug('TASK', `Running task: ${task.name}`);
       // 执行xxx任务携带的必要信息
       const data = {
         taskData: JSON.parse(task.taskData),
@@ -189,10 +194,10 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
         try {
           await taskInstance.execute(data, rssSourceId, rssSourceUrl, id); // Execute task
         } catch (error) {
-          this.handleError("Failed to execute task", error);
+          this.handleError('Failed to execute task', error);
         }
       } else {
-        this.winstonService.error("TASK", `Unknown task: ${task.functionName}`);
+        this.winstonService.error('TASK', `Unknown task: ${task.functionName}`);
       }
     };
 
@@ -202,7 +207,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       jobCallback,
       null,
       immediate, // Start immediately if 'immediate' is true
-      "Asia/Shanghai", // Timezone
+      'Asia/Shanghai', // Timezone
     );
 
     // Register the cron job and start it
@@ -217,7 +222,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
     // Log the addition of the cron job
     this.winstonService.info(
-      "TASK",
+      'TASK',
       `Job ${jobName} added with schedule ${task.schedule}`,
     );
 
@@ -232,7 +237,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     const { rssSourceId, rssSourceUrl, id } = task;
     try {
       // Update task status to 'running'
-      await this.taskPrismaService.updateTaskStatus(task.id, "running");
+      await this.taskPrismaService.updateTaskStatus(task.id, 'running');
 
       // Parse task data and execute task
       const data = JSON.parse(task.taskData);
@@ -244,13 +249,13 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       // Update task status to 'completed' and set immediate to false
       await this.taskPrismaService.updateTaskStatusAndImmediate(
         task.id,
-        "completed",
+        'completed',
         false,
       );
     } catch (error) {
       // Handle task execution failure
-      await this.taskPrismaService.updateTaskStatus(task.id, "failed");
-      this.handleError("Failed to execute immediate task", error);
+      await this.taskPrismaService.updateTaskStatus(task.id, 'failed');
+      this.handleError('Failed to execute immediate task', error);
     }
   }
 
@@ -259,7 +264,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     const jobName = this.currentTasks.get(taskId);
     if (jobName) {
       this.schedulerRegistry.deleteCronJob(jobName);
-      this.winstonService.warn("TASK", `Removed job ${jobName}`);
+      this.winstonService.warn('TASK', `Removed job ${jobName}`);
       this.currentTasks.delete(taskId);
       this.scheduledJobs.delete(taskId);
     }
@@ -281,12 +286,12 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
   // Method to output the current task list
   async outputCurrentTaskList() {
-    this.winstonService.info("TASK", "Current scheduled tasks:");
+    this.winstonService.info('TASK', 'Current scheduled tasks:');
     this.currentTasks.forEach((jobName, taskId) => {
       const task = this.scheduledJobs.get(taskId);
       if (task) {
         this.winstonService.info(
-          "TASK",
+          'TASK',
           `Job ${jobName} - Schedule: ${task.cronTime.source}`,
         );
       }
@@ -298,6 +303,6 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     error: any,
     isUserFacing: boolean = false,
   ) {
-    this.errorHandlingService.handleError("TASK", message, error, isUserFacing);
+    this.errorHandlingService.handleError('TASK', message, error, isUserFacing);
   }
 }
