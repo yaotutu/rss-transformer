@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// RssSource 模型：存储 RSS 源的基本信息
+model RssSource {
+  id             Int      @id @default(autoincrement()) // 主键，自增
+  sourceUrl      String   @unique // 文章来源 URL
+  customName     String? // 用户自定义名称
+  rssOriginInfo  String? // 原始的 RSS 信息，保存除具体的 item 信息以外的所有信息，用于重新输出时使用
+  feedType       String? // RSS 类型 atom/rss
+  xmlDeclaration String? // xml声明
+  rssItemTag     String? // RSS item 标签,保证task任务需要处理的标签都是存在的.
+  createdAt      DateTime @default(now()) // 创建时间，默认为当前时间
+  updatedAt      DateTime @updatedAt // 更新时间戳
+
+  // 关系字段
+  rssItems RssItem[] // 与 RssItem 表的关系 (一对多)
+  tasks    Task[] // 与 Task 表的关系 (一对多)
+}
+
+// RssItem 模型：存储每个 RSS 条目的详细信息
+model RssItem {
+  id              Int      @id @default(autoincrement()) // 主键，自增
+  rssSourceId     Int // 关联的 RSS 源 ID，指向 RssSource 表的主键
+  feedType        String? // RSS 类型 atom/rss
+  uniqueArticleId String // 根据文章内容+url hash生成的唯一id
+  itemUrl         String // 文章 URL
+  itemOriginInfo  String? // 每一个rssItem的原始信息
+  updatedAt       DateTime @updatedAt // 更新时间戳，系统自动生成
+  createdAt       DateTime @default(now()) // 创建时间，系统自动生成
+
+  // 关联关系字段
+  rssSource   RssSource        @relation(fields: [rssSourceId], references: [id], onDelete: Cascade) // 与 RssSource 表的关系
+  transformed RssTransformed[] // 与 RssTransformed 表的关系 (一对多)
+}
+
+// RssTransformed 模型：存储每个处理后的 RSS 条目详细信息
+model RssTransformed {
+  id                  Int      @id @default(autoincrement()) // 主键，自增
+  rssItemId           Int // 关联的 RSS 条目 ID，指向 RssItem 表的主键
+  taskId              Int // 关联的任务 ID，指向 Task 表的主键
+  uniqueArticleId     String // 根据文章内容+url hash生成的当前任务下的唯一id
+  itemUrl             String // 文章 URL
+  itemTransformedInfo String? // 每一个处理后 RSS 条目的原始信息
+  feedType            String? // RSS 类型 atom/rss
+  createdAt           DateTime @default(now()) // 创建时间，默认为当前时间
+  updatedAt           DateTime @updatedAt // 更新时间戳，系统自动生成
+  rssItem             RssItem  @relation(fields: [rssItemId], references: [id], onDelete: Cascade) // 与 RssItem 表的关系，指定 onDelete: Cascade
+}
+
+// Task 模型：存储定时任务信息
+model Task {
+  id           Int      @id @default(autoincrement()) // 主键，自增
+  name         String   @unique // 任务名称，用于标识任务，也是生成rss的url的一部分，必须唯一
+  schedule     String // 定时任务的调度规则，可以用字符串存储 cron 表达式或类似格式
+  taskType     String // 任务类型，例如：rss的翻译、rss的总结
+  rssItemTag   String? // 需要进行处理的标签
+  functionName String // 要调用的函数名称
+  taskData     String // 任务的数据或配置信息，可以是 JSON 字符串
+  createdAt    DateTime @default(now()) // 创建时间，默认为当前时间
+  updatedAt    DateTime @updatedAt // 更新时间戳
+  immediate    Boolean  @default(false) // 是否需要立即执行
+  status       String   @default("PENDING") // 任务执行状态
+
+  // 每个任务必须关联一个 RssSource 的 id
+  rssSourceId  Int // 关联的 RSS 源 ID，指向 RssSource 表的主键
+  rssSourceUrl String // 关联的 RSS 源 URL，用于生成任务的唯一标识
+
+  // 与 RssSource 表的关系 (一对一)
+  rssSource RssSource @relation(fields: [rssSourceId], references: [id], onDelete: Cascade) // 与 RssSource 表的关系，指定 onDelete: Cascade
+}

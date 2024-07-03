@@ -3,20 +3,16 @@
     "configurations": [
         {
             "type": "node",
-            "request": "launch",
-            "name": "Debug Nest Framework",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run",
-                "start:debug",
-                "--",
-                "--inspect-brk"
-            ],
-            "autoAttachChildProcesses": true,
+            "request": "attach",
+            "name": "Attach to Backend Debug",
+            "port": 9229,
             "restart": true,
             "sourceMaps": true,
-            "stopOnEntry": false,
-            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/packages/backend",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "autoAttachChildProcesses": true
         }
     ]
 }
