@@ -23,6 +23,7 @@ export type LogType =
   | 'UPDATE_RSS_ITEMS'
   | 'MODEL_FACTORY'
   | 'MODEL_CONFIG'
+  | 'HTML_SPLIT'
   | 'PARSER_RSS_TO_JSON';
 
 export type tsakType = 'TRANSLATE' | 'UPDATE_RSS_ITEMS';
