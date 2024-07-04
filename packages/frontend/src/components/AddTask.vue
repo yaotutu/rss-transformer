@@ -144,7 +144,7 @@ const taskForm = reactive({
   taskData: '',
   immediate: undefined,
   rssItemTag: [],
-  taskData: '{}',
+  taskData: null,
 });
 
 const handleTaskSubmit = (action) => {
@@ -159,10 +159,10 @@ const handleTaskSubmit = (action) => {
     taskData,
   } = taskForm;
 
-  if (!isJsonString(taskData)) {
-    alert('任务数据必须是json字符串,必须包含functionName与taskData属性');
-    return;
-  }
+  // if (!isJsonString(taskData)) {
+  //   alert('任务数据必须是json字符串,必须包含functionName与taskData属性');
+  //   return;
+  // }
 
   const rssSourceId = props.rssSourceUrlOptions.find(
     (item) => item.value === rssSourceUrl,

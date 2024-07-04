@@ -1,11 +1,11 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { RssSource } from '@prisma/client';
 import { createHash } from 'node:crypto';
+import { InternalException } from 'src/common/exceptions/custom-exceptions';
 import { WinstonService } from 'src/common/logger/winston.service';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { RssParserService } from 'src/common/rss-parser/rss-parser.service';
 import { CreateRssDto } from './dto/create-rss.dto';
-import { RssSource } from '@prisma/client';
-import { InternalException } from 'src/common/exceptions/custom-exceptions';
 
 @Injectable()
 export class RssService {
@@ -66,11 +66,18 @@ export class RssService {
         throw new InternalException(500, '没有可用的rss item数据');
       }
       const rssItemTag = this.getFirstLevelKeys(items[0]);
-      this.rssPrismaService.updateRssSource(id, {
-        rssOriginInfo: JSON.stringify(feedInfo),
-        feedType,
-        rssItemTag: JSON.stringify(rssItemTag),
-      });
+      const updateRssSourceResult = await this.rssPrismaService.updateRssSource(
+        id,
+        {
+          rssOriginInfo: JSON.stringify(feedInfo),
+          feedType,
+          rssItemTag: JSON.stringify(rssItemTag),
+        },
+      );
+      this.winstonService.info(
+        'DATABASE',
+        `Updated RSS source info successfully. ${updateRssSourceResult}`,
+      );
       let organizedItem = [];
       if (feedType === 'atom') {
         organizedItem = items.map((item) => {

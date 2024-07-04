@@ -50,7 +50,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       rssSourceUrl,
       rssItemTag,
     } = createTaskDto;
-    if (!createTaskDto.taskData || !taskMapping[taskType]) {
+    if (!createTaskDto.taskData && !taskMapping[taskType]) {
       this.handleError('taskData or taskType is not provided', null, false);
       // return "taskData or taskType is not provided";
     }

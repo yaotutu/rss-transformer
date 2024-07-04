@@ -48,7 +48,10 @@ export class GenericLlmTask implements Task {
     const rssTransformedItems = await Promise.all(
       rssItems.map(async (item) => {
         const rssItemTagList = JSON.parse(rssItemTag);
+        // 原始数据
         let rssItemInfo = JSON.parse(item.itemOriginInfo);
+        // 转换后的数据
+        let finalRssItemInfo = '';
         await Promise.all(
           rssItemTagList.map(async (tag) => {
             const transedContent = rssItemInfo[tag];
@@ -59,7 +62,7 @@ export class GenericLlmTask implements Task {
               finalContent = transedContent._;
             }
             const transedString = await handleTaskExecution(finalContent);
-            rssItemInfo[tag] = this.modifyTagContent(
+            finalRssItemInfo = this.modifyTagContent(
               rssItemInfo,
               tag,
               transedString,
@@ -71,7 +74,7 @@ export class GenericLlmTask implements Task {
           taskId: taskId,
           uniqueArticleId: item.uniqueArticleId,
           itemUrl: item.itemUrl,
-          itemTransformedInfo: JSON.stringify(rssItemInfo),
+          itemTransformedInfo: JSON.stringify(finalRssItemInfo),
         };
       }),
     );

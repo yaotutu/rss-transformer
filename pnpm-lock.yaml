@@ -12,13 +12,16 @@ importers:
     dependencies:
       '@langchain/community':
         specifier: ^0.2.14
-        version: 0.2.14(lodash@4.17.21)(openai@4.52.1)
+        version: 0.2.14(axios@1.7.2)(lodash@4.17.21)(openai@4.52.1)
       '@langchain/core':
         specifier: ^0.2.10
-        version: 0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
+        version: 0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       '@langchain/openai':
         specifier: ^0.1.3
-        version: 0.1.3(langchain@0.2.7(openai@4.52.1))
+        version: 0.1.3(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))
+      '@nestjs/axios':
+        specifier: ^3.0.2
+        version: 3.0.2(@nestjs/common@10.3.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.2)(rxjs@7.8.1)
       '@nestjs/common':
         specifier: ^10.3.9
         version: 10.3.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -40,6 +43,9 @@ importers:
       '@prisma/client':
         specifier: 5.15.0
         version: 5.15.0(prisma@5.16.0)
+      axios:
+        specifier: ^1.7.2
+        version: 1.7.2
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -57,7 +63,7 @@ importers:
         version: 0.13.0
       langchain:
         specifier: ^0.2.7
-        version: 0.2.7(openai@4.52.1)
+        version: 0.2.7(axios@1.7.2)(openai@4.52.1)
       prompts:
         specifier: link:@langchain/core/prompts
         version: link:@langchain/core/prompts
@@ -89,9 +95,6 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1
     devDependencies:
-      '@biomejs/biome':
-        specifier: 1.7.3
-        version: 1.7.3
       '@nestjs/cli':
         specifier: ^10.3.2
         version: 10.3.2
@@ -353,59 +356,6 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
-
-  '@biomejs/biome@1.7.3':
-    resolution: {integrity: sha512-ogFQI+fpXftr+tiahA6bIXwZ7CSikygASdqMtH07J2cUzrpjyTMVc9Y97v23c7/tL1xCZhM+W9k4hYIBm7Q6cQ==}
-    engines: {node: '>=14.21.3'}
-    hasBin: true
-
-  '@biomejs/cli-darwin-arm64@1.7.3':
-    resolution: {integrity: sha512-eDvLQWmGRqrPIRY7AIrkPHkQ3visEItJKkPYSHCscSDdGvKzYjmBJwG1Gu8+QC5ed6R7eiU63LEC0APFBobmfQ==}
-    engines: {node: '>=14.21.3'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@biomejs/cli-darwin-x64@1.7.3':
-    resolution: {integrity: sha512-JXCaIseKRER7dIURsVlAJacnm8SG5I0RpxZ4ya3dudASYUc68WGl4+FEN03ABY3KMIq7hcK1tzsJiWlmXyosZg==}
-    engines: {node: '>=14.21.3'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@biomejs/cli-linux-arm64-musl@1.7.3':
-    resolution: {integrity: sha512-c8AlO45PNFZ1BYcwaKzdt46kYbuP6xPGuGQ6h4j3XiEDpyseRRUy/h+6gxj07XovmyxKnSX9GSZ6nVbZvcVUAw==}
-    engines: {node: '>=14.21.3'}
-    cpu: [arm64]
-    os: [linux]
-
-  '@biomejs/cli-linux-arm64@1.7.3':
-    resolution: {integrity: sha512-phNTBpo7joDFastnmZsFjYcDYobLTx4qR4oPvc9tJ486Bd1SfEVPHEvJdNJrMwUQK56T+TRClOQd/8X1nnjA9w==}
-    engines: {node: '>=14.21.3'}
-    cpu: [arm64]
-    os: [linux]
-
-  '@biomejs/cli-linux-x64-musl@1.7.3':
-    resolution: {integrity: sha512-UdEHKtYGWEX3eDmVWvQeT+z05T9/Sdt2+F/7zmMOFQ7boANeX8pcO6EkJPK3wxMudrApsNEKT26rzqK6sZRTRA==}
-    engines: {node: '>=14.21.3'}
-    cpu: [x64]
-    os: [linux]
-
-  '@biomejs/cli-linux-x64@1.7.3':
-    resolution: {integrity: sha512-vnedYcd5p4keT3iD48oSKjOIRPYcjSNNbd8MO1bKo9ajg3GwQXZLAH+0Cvlr+eMsO67/HddWmscSQwTFrC/uPA==}
-    engines: {node: '>=14.21.3'}
-    cpu: [x64]
-    os: [linux]
-
-  '@biomejs/cli-win32-arm64@1.7.3':
-    resolution: {integrity: sha512-unNCDqUKjujYkkSxs7gFIfdasttbDC4+z0kYmcqzRk6yWVoQBL4dNLcCbdnJS+qvVDNdI9rHp2NwpQ0WAdla4Q==}
-    engines: {node: '>=14.21.3'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@biomejs/cli-win32-x64@1.7.3':
-    resolution: {integrity: sha512-ZmByhbrnmz/UUFYB622CECwhKIPjJLLPr5zr3edhu04LzbfcOrz16VYeNq5dpO1ADG70FORhAJkaIGdaVBG00w==}
-    engines: {node: '>=14.21.3'}
-    cpu: [x64]
-    os: [win32]
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -1073,6 +1023,13 @@ packages:
   '@microsoft/tsdoc@0.14.2':
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
 
+  '@nestjs/axios@3.0.2':
+    resolution: {integrity: sha512-Z6GuOUdNQjP7FX+OuV2Ybyamse+/e0BFdTWBX5JxpBDKA+YkdLynDgG6HTF04zy6e9zPa19UX0WA2VDoehwhXQ==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+      axios: ^1.3.1
+      rxjs: ^6.0.0 || ^7.0.0
+
   '@nestjs/cli@10.3.2':
     resolution: {integrity: sha512-aWmD1GLluWrbuC4a1Iz/XBk5p74Uj6nIVZj6Ov03JbTfgtWqGFLtXuMetvzMiHxfrHehx/myt2iKAPRhKdZvTg==}
     engines: {node: '>= 16.14'}
@@ -1668,6 +1625,9 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
+  axios@1.7.2:
+    resolution: {integrity: sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==}
+
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -2216,6 +2176,15 @@ packages:
 
   fn.name@1.1.0:
     resolution: {integrity: sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==}
+
+  follow-redirects@1.15.6:
+    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
 
   foreground-child@3.2.1:
     resolution: {integrity: sha512-PXUUyLqrR2XCWICfv6ukppP96sdFwWbNEnfEMt7jNsISjMsvaLNinAHNDYyvkyU+SZG2BTSbT5NjG+vZslfGTA==}
@@ -3434,6 +3403,9 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
+  proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -4379,41 +4351,6 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@biomejs/biome@1.7.3':
-    optionalDependencies:
-      '@biomejs/cli-darwin-arm64': 1.7.3
-      '@biomejs/cli-darwin-x64': 1.7.3
-      '@biomejs/cli-linux-arm64': 1.7.3
-      '@biomejs/cli-linux-arm64-musl': 1.7.3
-      '@biomejs/cli-linux-x64': 1.7.3
-      '@biomejs/cli-linux-x64-musl': 1.7.3
-      '@biomejs/cli-win32-arm64': 1.7.3
-      '@biomejs/cli-win32-x64': 1.7.3
-
-  '@biomejs/cli-darwin-arm64@1.7.3':
-    optional: true
-
-  '@biomejs/cli-darwin-x64@1.7.3':
-    optional: true
-
-  '@biomejs/cli-linux-arm64-musl@1.7.3':
-    optional: true
-
-  '@biomejs/cli-linux-arm64@1.7.3':
-    optional: true
-
-  '@biomejs/cli-linux-x64-musl@1.7.3':
-    optional: true
-
-  '@biomejs/cli-linux-x64@1.7.3':
-    optional: true
-
-  '@biomejs/cli-win32-arm64@1.7.3':
-    optional: true
-
-  '@biomejs/cli-win32-x64@1.7.3':
-    optional: true
-
   '@colors/colors@1.5.0':
     optional: true
 
@@ -4723,16 +4660,16 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@langchain/community@0.2.14(lodash@4.17.21)(openai@4.52.1)':
+  '@langchain/community@0.2.14(axios@1.7.2)(lodash@4.17.21)(openai@4.52.1)':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.1.3(langchain@0.2.3(openai@4.52.1))
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.1.3(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))
       binary-extensions: 2.3.0
       expr-eval: 2.0.2
       flat: 5.0.2
       js-yaml: 4.1.0
-      langchain: 0.2.3(openai@4.52.1)
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      langchain: 0.2.3(axios@1.7.2)(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       uuid: 9.0.1
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
@@ -4748,13 +4685,13 @@ snapshots:
       - peggy
       - pyodide
 
-  '@langchain/core@0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -4766,13 +4703,13 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/core@0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -4784,9 +4721,9 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/openai@0.0.34(langchain@0.2.3(openai@4.52.1))':
+  '@langchain/openai@0.0.34(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
       openai: 4.52.1
       zod: 3.23.8
@@ -4795,9 +4732,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/openai@0.1.3(langchain@0.2.3(openai@4.52.1))':
+  '@langchain/openai@0.1.3(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
       openai: 4.52.1
       zod: 3.23.8
@@ -4806,9 +4743,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/openai@0.1.3(langchain@0.2.7(openai@4.52.1))':
+  '@langchain/openai@0.1.3(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
       openai: 4.52.1
       zod: 3.23.8
@@ -4817,17 +4754,17 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
       - openai
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
@@ -4840,6 +4777,12 @@ snapshots:
   '@lukeed/csprng@1.1.0': {}
 
   '@microsoft/tsdoc@0.14.2': {}
+
+  '@nestjs/axios@3.0.2(@nestjs/common@10.3.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.2)(rxjs@7.8.1)':
+    dependencies:
+      '@nestjs/common': 10.3.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+      axios: 1.7.2
+      rxjs: 7.8.1
 
   '@nestjs/cli@10.3.2':
     dependencies:
@@ -5503,6 +5446,14 @@ snapshots:
 
   asynckit@0.4.0: {}
 
+  axios@1.7.2:
+    dependencies:
+      follow-redirects: 1.15.6
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   babel-jest@29.7.0(@babel/core@7.24.7):
     dependencies:
       '@babel/core': 7.24.7
@@ -6113,6 +6064,8 @@ snapshots:
   flat@5.0.2: {}
 
   fn.name@1.1.0: {}
+
+  follow-redirects@1.15.6: {}
 
   foreground-child@3.2.1:
     dependencies:
@@ -6779,17 +6732,17 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langchain@0.2.3(openai@4.52.1):
+  langchain@0.2.3(axios@1.7.2)(openai@4.52.1):
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.0.34(langchain@0.2.3(openai@4.52.1))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.0.34(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -6797,21 +6750,23 @@ snapshots:
       yaml: 2.4.5
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
+    optionalDependencies:
+      axios: 1.7.2
     transitivePeerDependencies:
       - encoding
       - openai
 
-  langchain@0.2.7(openai@4.52.1):
+  langchain@0.2.7(axios@1.7.2)(openai@4.52.1):
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.1.3(langchain@0.2.7(openai@4.52.1))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.1.3(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -6819,13 +6774,15 @@ snapshots:
       yaml: 2.4.5
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
+    optionalDependencies:
+      axios: 1.7.2
     transitivePeerDependencies:
       - encoding
       - openai
 
   langchainhub@0.0.11: {}
 
-  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(openai@4.52.1))(openai@4.52.1):
+  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -6833,11 +6790,11 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(openai@4.52.1))(openai@4.52.1)
-      langchain: 0.2.3(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
+      langchain: 0.2.3(axios@1.7.2)(openai@4.52.1)
       openai: 4.52.1
 
-  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(openai@4.52.1))(openai@4.52.1):
+  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -6845,8 +6802,8 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(openai@4.52.1))(openai@4.52.1)
-      langchain: 0.2.7(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(openai@4.52.1))(openai@4.52.1)
+      langchain: 0.2.7(axios@1.7.2)(openai@4.52.1)
       openai: 4.52.1
 
   leven@3.1.0: {}
@@ -7207,6 +7164,8 @@ snapshots:
     dependencies:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
+
+  proxy-from-env@1.1.0: {}
 
   punycode@2.3.1: {}
 
