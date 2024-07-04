@@ -1,8 +1,7 @@
-// src/services/langchain.service.ts
-
-import { Injectable } from '@nestjs/common';
-import { ModelFactory } from './model-factory';
 import { StringOutputParser } from '@langchain/core/output_parsers';
+import { Injectable } from '@nestjs/common';
+import { HtmlSplitterService } from '../rss-parser/html-splitter.service';
+import { ModelFactory } from './model-factory';
 import {
   getSingleParagraphTranslationPrompt,
   getTranslationPrompt,
@@ -12,10 +11,21 @@ import {
 export class LangchainService {
   private model;
 
-  constructor(private modelFactory: ModelFactory) {
+  constructor(
+    private modelFactory: ModelFactory,
+    private htmlSplitterService: HtmlSplitterService, // 注入 HtmlSplitterService
+  ) {
     this.model = this.modelFactory.getModel('OpenAI'); // 默认使用 OpenAI 模型
   }
 
+  /**
+   * Translates an array of paragraphs from one language to another.
+   * @param paragraphs - The array of paragraphs to be translated.
+   * @param originLang - The language of the original paragraphs. Defaults to '英文'.
+   * @param targetLang - The language to translate the paragraphs into. Defaults to '中文'.
+   * @returns The translated paragraphs as an array.
+   * @throws Throws an error if there is an issue translating the paragraphs.
+   */
   async translateParagraphs(
     paragraphs: string[],
     originLang: string = '英文',
@@ -52,10 +62,19 @@ export class LangchainService {
     }
   }
 
+  /**
+   * Translates a single paragraph from one language to another.
+   * @param data - The paragraph to be translated.
+   * @param originLang - The language of the original paragraph. Defaults to '英文'.
+   * @param targetLang - The language to translate the paragraph into. Defaults to '中文'.
+   * @returns The translated paragraph.
+   * @throws Throws an error if there is an issue translating the paragraph.
+   */
   async translateSingleParagraph(
     data: string,
     originLang: string = '英文',
     targetLang: string = '中文',
+    maxLength: number = 1000,
   ) {
     // 获取单段翻译的 Prompt 模板
     const prompt = getSingleParagraphTranslationPrompt(originLang, targetLang);
@@ -71,6 +90,49 @@ export class LangchainService {
       return result.trim(); // 返回翻译后的单段结果
     } catch (error) {
       console.error('Error translating single paragraph:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Translates a single paragraph from one language to another, splitting it if necessary.
+   * @param data - The paragraph to be translated.
+   * @param originLang - The language of the original paragraph. Defaults to '英文'.
+   * @param targetLang - The language to translate the paragraph into. Defaults to '中文'.
+   * @param maxLength - The maximum length of each split chunk. Defaults to 1000.
+   * @returns The translated paragraph.
+   * @throws Throws an error if there is an issue translating the paragraph.
+   */
+  async translateAndSplitParagraph(
+    data: string,
+    originLang: string = '英文',
+    targetLang: string = '中文',
+    maxLength: number = 1000,
+  ) {
+    try {
+      // 使用 HtmlSplitterService 进行 HTML 内容切割
+      const splitParagraphs = this.htmlSplitterService.splitHtmlContent(
+        data,
+        maxLength,
+      );
+
+      // 遍历切割后的段落数组并进行翻译
+      const translatedParts = [];
+      for (const part of splitParagraphs) {
+        const translatedPart = await this.translateSingleParagraph(
+          part,
+          originLang,
+          targetLang,
+        );
+        translatedParts.push(translatedPart);
+      }
+
+      // 将翻译后的段落重新拼接成一个字符串
+      const translatedContent = translatedParts.join(''); // 拼接翻译后的段落
+
+      return translatedContent; // 返回翻译后的完整字符串
+    } catch (error) {
+      console.error('Error translating and splitting paragraph:', error);
       throw error;
     }
   }

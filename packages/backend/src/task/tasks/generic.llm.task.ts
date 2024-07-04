@@ -27,8 +27,8 @@ export class GenericLlmTask implements Task {
 
     if (taskType === 'TRANSLATE') {
       const { originLang, targetLang } = JSON.parse(taskData);
-      handleTaskExecution = async (data: string) => {
-        return this.langChainService.translateSingleParagraph(
+      handleTaskExecution = (data: string) => {
+        return this.langChainService.translateAndSplitParagraph(
           data,
           originLang,
           targetLang,
@@ -61,11 +61,11 @@ export class GenericLlmTask implements Task {
             } else {
               finalContent = transedContent._;
             }
-            const transedString = await handleTaskExecution(finalContent);
+            const processedString = await handleTaskExecution(finalContent);
             finalRssItemInfo = this.modifyTagContent(
               rssItemInfo,
               tag,
-              transedString,
+              processedString,
             );
           }),
         );

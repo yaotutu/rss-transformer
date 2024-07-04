@@ -14,6 +14,7 @@ import { RssPrismaService } from './prisma/rss-prisma.service';
 import { TaskPrismaService } from './prisma/task-prisma.service';
 import { JsonToXmlService } from './rss-parser/json-to-xml.service';
 import { RssParserService } from './rss-parser/rss-parser.service';
+import { HtmlSplitterService } from './rss-parser/html-splitter.service';
 
 @Module({
   imports: [HttpModule],
@@ -31,6 +32,7 @@ import { RssParserService } from './rss-parser/rss-parser.service';
     RssParserService,
     JsonToXmlService,
     HttpClientService,
+    HtmlSplitterService,
   ],
   exports: [
     ResponseInterceptor,
@@ -45,6 +47,7 @@ import { RssParserService } from './rss-parser/rss-parser.service';
     ModelConfigService,
     RssParserService,
     JsonToXmlService,
+    HtmlSplitterService,
   ],
 })
 export class CommonModule {}
