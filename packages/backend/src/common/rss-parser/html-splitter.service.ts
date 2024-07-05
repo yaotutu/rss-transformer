@@ -34,42 +34,77 @@ export class HtmlSplitterService {
    *
    * @param htmlContent - The HTML content to split.
    * @param maxLength - The maximum length of each chunk (default: 1000).
-   * @returns An array of strings representing the split HTML content.
+   * @returns An array of ChunkInfo objects representing the split HTML content.
    */
-  splitHtmlContent(htmlContent: string, maxLength = 1000): string[] {
+  splitHtmlContent(htmlContent: string, maxLength = 1000): ChunkInfo[] {
     const elements = this.parseHtmlContent(htmlContent);
-    const chunks: string[] = [];
+    const chunks: ChunkInfo[] = [];
     let currentChunkLength = 0;
     let currentChunk: AnyNode[] = [];
+    const contextStack: AnyNode[][] = [[]];
 
-    elements.forEach((element) => {
-      const serializedElement = serialize(element as AnyNode);
-      const elementLength = serializedElement.length;
+    const traverseNodes = (nodes: AnyNode[], level = 0) => {
+      nodes.forEach((node) => {
+        const serializedNode = serialize(node);
+        const nodeLength = serializedNode.length;
 
-      if (currentChunkLength + elementLength > maxLength) {
-        if (currentChunk.length > 0) {
-          chunks.push(this.serializeNodes(currentChunk));
-          currentChunk = [];
-          currentChunkLength = 0;
-        }
+        if (currentChunkLength + nodeLength > maxLength) {
+          if (currentChunk.length > 0) {
+            chunks.push({
+              htmlContent: this.serializeNodes(currentChunk),
+              level: level,
+            });
+            contextStack.push(currentChunk); // 保存上下文
+            currentChunk = [];
+            currentChunkLength = 0;
+          }
 
-        if (elementLength <= maxLength) {
-          currentChunk.push(element as AnyNode);
-          currentChunkLength = elementLength;
+          if (nodeLength <= maxLength || isPunctuationOrWhitespace(node)) {
+            currentChunk.push(node);
+            currentChunkLength = nodeLength;
+          } else {
+            // 递归切割较大的节点
+            if (
+              (node as any).childNodes &&
+              (node as any).childNodes.length > 0
+            ) {
+              traverseNodes((node as any).childNodes, level + 1);
+            } else {
+              chunks.push({
+                htmlContent: serializedNode, // 无法递归切割时，直接添加整个节点
+                level: level,
+              });
+            }
+          }
         } else {
-          chunks.push(serializedElement); // 直接截断，不再递归遍历子元素
+          currentChunk.push(node);
+          currentChunkLength += nodeLength;
         }
-      } else {
-        currentChunk.push(element as AnyNode);
-        currentChunkLength += elementLength;
-      }
-    });
+      });
+    };
+
+    traverseNodes(elements as AnyNode[]);
 
     if (currentChunk.length > 0) {
-      chunks.push(this.serializeNodes(currentChunk));
+      chunks.push({
+        htmlContent: this.serializeNodes(currentChunk),
+        level: 0,
+      });
+      contextStack.push(currentChunk); // 保存最后的上下文
     }
+
     this.winstonService.info('HTML_SPLIT', JSON.stringify(chunks));
-    return chunks.filter((chunk) => chunk.trim() !== ''); // 过滤掉空白字符和空标签
+    return chunks.filter((chunk) => chunk.htmlContent.trim() !== ''); // 过滤掉空白字符和空标签
+  }
+
+  /**
+   * Combines processed chunks back into a single HTML string.
+   *
+   * @param processedChunks - The processed chunks of HTML content.
+   * @returns The combined HTML content as a single string.
+   */
+  combineChunks(processedChunks: ChunkInfo[]): string {
+    return processedChunks.map((chunk) => chunk.htmlContent).join('');
   }
 
   /**
@@ -81,4 +116,26 @@ export class HtmlSplitterService {
   private serializeNodes(nodes: AnyNode[]): string {
     return nodes.map((node) => serialize(node)).join('');
   }
+}
+
+// 定义 ChunkInfo 接口，用于保存切割后的块信息
+interface ChunkInfo {
+  htmlContent: string;
+  level: number;
+}
+
+/**
+ * Determines if a node is a punctuation or whitespace character.
+ * 用于判断一个节点是否为标点符号或空白字符
+ *
+ * @param node - The node to check.
+ * @returns Whether the node is a punctuation or whitespace character.
+ */
+function isPunctuationOrWhitespace(node: AnyNode): boolean {
+  const textNode = node as unknown as { data?: string };
+  if (textNode.data) {
+    const text = textNode.data;
+    return /^[\s\n()「」[\]{}.,;:!?'"‘’“”\-—]+$/.test(text);
+  }
+  return false;
 }

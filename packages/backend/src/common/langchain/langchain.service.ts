@@ -14,9 +14,7 @@ export class LangchainService {
   constructor(
     private modelFactory: ModelFactory,
     private htmlSplitterService: HtmlSplitterService, // 注入 HtmlSplitterService
-  ) {
-    this.model = this.modelFactory.getModel('OpenAI');
-  }
+  ) {}
 
   /**
    * Translates an array of paragraphs from one language to another.
@@ -96,9 +94,11 @@ export class LangchainService {
 
   /**
    * Translates a single paragraph from one language to another, splitting it if necessary.
+   * 翻译单个段落，必要时进行切割。
+   *
    * @param data - The paragraph to be translated.
-   * @param originLang - The language of the original paragraph. Defaults to '英文'.
-   * @param targetLang - The language to translate the paragraph into. Defaults to '中文'.
+   * @param originLang - The language of the original paragraph. Defaults to '英文' (English).
+   * @param targetLang - The language to translate the paragraph into. Defaults to '中文' (Chinese).
    * @param maxLength - The maximum length of each split chunk. Defaults to 1000.
    * @returns The translated paragraph.
    * @throws Throws an error if there is an issue translating the paragraph.
@@ -108,7 +108,9 @@ export class LangchainService {
     originLang: string = '英文',
     targetLang: string = '中文',
     maxLength: number = 1000,
-  ) {
+  ): Promise<string> {
+    this.model = this.modelFactory.getModel('Ollama');
+
     try {
       // 使用 HtmlSplitterService 进行 HTML 内容切割
       const splitParagraphs = this.htmlSplitterService.splitHtmlContent(
@@ -120,15 +122,19 @@ export class LangchainService {
       const translatedParts = [];
       for (const part of splitParagraphs) {
         const translatedPart = await this.translateSingleParagraph(
-          part,
+          part.htmlContent, // 只翻译 HTML 内容
           originLang,
           targetLang,
         );
-        translatedParts.push(translatedPart);
+        translatedParts.push({
+          htmlContent: translatedPart,
+          level: part.level,
+        });
       }
 
-      // 将翻译后的段落重新拼接成一个字符串
-      const translatedContent = translatedParts.join(''); // 拼接翻译后的段落
+      // 使用 combineChunks 方法将处理后的块结构还原回完整的 HTML 字符串
+      const translatedContent =
+        this.htmlSplitterService.combineChunks(translatedParts);
 
       return translatedContent; // 返回翻译后的完整字符串
     } catch (error) {
@@ -136,6 +142,7 @@ export class LangchainService {
       throw error;
     }
   }
+
   testFn() {
     console.log('testFn');
   }
