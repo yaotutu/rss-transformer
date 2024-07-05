@@ -1,6 +1,6 @@
 // src/config/model-config.service.ts
 
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ApiException } from '../dto/common.dto';
 import { WinstonService } from '../logger/winston.service';
 
@@ -20,6 +20,9 @@ export class ModelConfigService {
     Ollama: () => ({
       baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
       model: process.env.OLLAMA_MODEL || 'qwen2:1.5b',
+    }),
+    QianFan: () => ({
+      model: 'ERNIE-Speed-128K',
     }),
     // Add more model configs here as needed
   };

@@ -23,6 +23,7 @@
     "migrate-and-generate": "npm run migrate -- && npm run generate"
   },
   "dependencies": {
+    "@langchain/baidu-qianfan": "^0.0.1",
     "@langchain/community": "^0.2.14",
     "@langchain/core": "^0.2.10",
     "@langchain/openai": "^0.1.3",

@@ -15,7 +15,7 @@ export class LangchainService {
     private modelFactory: ModelFactory,
     private htmlSplitterService: HtmlSplitterService, // 注入 HtmlSplitterService
   ) {
-    this.model = this.modelFactory.getModel('OpenAI'); // 默认使用 OpenAI 模型
+    this.model = this.modelFactory.getModel('OpenAI');
   }
 
   /**
@@ -135,5 +135,8 @@ export class LangchainService {
       console.error('Error translating and splitting paragraph:', error);
       throw error;
     }
+  }
+  testFn() {
+    console.log('testFn');
   }
 }

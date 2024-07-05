@@ -1,11 +1,13 @@
 // src/models/model-factory.ts
 
+import { ChatBaiduQianfan } from '@langchain/baidu-qianfan'; // 添加这一行
+import { Ollama } from '@langchain/community/llms/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { Injectable } from '@nestjs/common';
 import { ModelConfigService } from '../config/model-config.service';
-import { ChatOpenAI } from '@langchain/openai';
 import { WinstonService } from '../logger/winston.service';
-import { Ollama } from '@langchain/community/llms/ollama';
 
+type ModelType = 'OpenAI' | 'Ollama' | 'QianFan';
 @Injectable()
 export class ModelFactory {
   private models = new Map<string, any>();
@@ -15,7 +17,7 @@ export class ModelFactory {
     private logger: WinstonService,
   ) {}
 
-  getModel(modelType: string): any {
+  getModel(modelType: ModelType): any {
     try {
       if (!this.models.has(modelType)) {
         const config = this.modelConfigService.getModelConfig(modelType);
@@ -48,7 +50,8 @@ export class ModelFactory {
         return ChatOpenAI; // Assuming ChatOpenAI is the model class
       case 'Ollama': // 添加这一行
         return Ollama; // 添加这一行
-      // Add more model classes here as needed
+      case 'QianFan':
+        return ChatBaiduQianfan;
       default:
         this.logger.error('MODEL_FACTORY', `Unknown model type: ${modelType}`);
         return null;

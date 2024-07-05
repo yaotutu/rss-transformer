@@ -9,7 +9,6 @@ import { Task } from 'src/types';
 export class GenericLlmTask implements Task {
   constructor(
     private rssPrismaService: RssPrismaService,
-
     private taskPrismaService: TaskPrismaService,
     private langChainService: LangchainService,
   ) {}
