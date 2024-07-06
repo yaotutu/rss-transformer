@@ -6,6 +6,11 @@ const appController = {
   getHello: () => request('/', 'GET'),
 };
 
+/**
+ * Controller for handling RSS operations.
+ *
+ * @namespace rssController
+ */
 const rssController = {
   createRss: (data) => request('/rss', 'POST', data),
   findAllRss: () => request('/rss', 'GET'),

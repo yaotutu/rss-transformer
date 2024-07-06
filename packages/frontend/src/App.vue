@@ -1,3 +1,6 @@
+/** * The main component of the application. * This component sets up the
+necessary imports and initializes the reactive variables. * It also fetches the
+RSS source options on component mount. */
 <template>
   <div class="wrap">
     <AddRssSource @rssAdded="fetchRssSourceOptions" />
@@ -55,12 +58,19 @@ const fetchRssSourceOptions = async () => {
   }));
 };
 
+/**
+ * Fetches the task source data from the task controller and assigns it to the taskSource object.
+ * @returns {Promise<void>} A promise that resolves when the task source data is fetched and assigned.
+ */
 const fetchTaskSource = async () => {
   const response = await taskController.getAllTask();
   Object.assign(taskSource, response);
 };
 
-// Call the fetchRssSourceOptions function on component mount
+/**
+ * Calls the fetchRssSourceOptions function and fetchTaskSource function when the component is mounted.
+ * @returns {Promise<void>} A promise that resolves when both fetchRssSourceOptions and fetchTaskSource are completed.
+ */
 onMounted(async () => {
   await fetchRssSourceOptions();
   await fetchTaskSource();
