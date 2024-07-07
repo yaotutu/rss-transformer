@@ -43,6 +43,7 @@
     "cron": "^3.1.7",
     "dom-serializer": "^2.0.0",
     "domhandler": "^5.0.3",
+    "handlebars": "^4.7.8",
     "html-to-text": "^9.0.5",
     "htmlparser2": "^9.1.0",
     "iconv-lite": "^0.6.3",
