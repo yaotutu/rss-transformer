@@ -12,16 +12,19 @@ importers:
     dependencies:
       '@langchain/baidu-qianfan':
         specifier: ^0.0.1
-        version: 0.0.1(@babel/core@7.24.7)(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+        version: 0.0.1(@babel/core@7.24.7)(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       '@langchain/community':
         specifier: ^0.2.14
-        version: 0.2.14(axios@1.7.2)(cheerio@1.0.0-rc.12)(crypto-js@4.2.0)(lodash@4.17.21)(openai@4.52.1)
+        version: 0.2.14(axios@1.7.2)(cheerio@1.0.0-rc.12)(crypto-js@4.2.0)(html-to-text@9.0.5)(lodash@4.17.21)(openai@4.52.1)
       '@langchain/core':
         specifier: ^0.2.10
-        version: 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+        version: 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       '@langchain/openai':
         specifier: ^0.1.3
-        version: 0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))
+        version: 0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))
+      '@langchain/textsplitters':
+        specifier: ^0.0.3
+        version: 0.0.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       '@nestjs/axios':
         specifier: ^3.0.2
         version: 3.0.2(@nestjs/common@10.3.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.2)(rxjs@7.8.1)
@@ -67,6 +70,9 @@ importers:
       domhandler:
         specifier: ^5.0.3
         version: 5.0.3
+      html-to-text:
+        specifier: ^9.0.5
+        version: 9.0.5
       htmlparser2:
         specifier: ^9.1.0
         version: 9.1.0
@@ -78,7 +84,7 @@ importers:
         version: 0.13.0
       langchain:
         specifier: ^0.2.7
-        version: 0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1)
+        version: 0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1)
       prompts:
         specifier: link:@langchain/core/prompts
         version: link:@langchain/core/prompts
@@ -1351,6 +1357,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@selderee/plugin-htmlparser2@0.11.0':
+    resolution: {integrity: sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ==}
+
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
 
@@ -2443,6 +2452,10 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
+  html-to-text@9.0.5:
+    resolution: {integrity: sha512-qY60FjREgVZL03vJU6IfMV4GDjGBIoOyvuFdpBDIX9yTlDw0TjxVBQp+P8NvpdIXNJvfWBTNul7fsAQJq2FNpg==}
+    engines: {node: '>=14'}
+
   htmlparser2@8.0.2:
     resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
 
@@ -3117,6 +3130,9 @@ packages:
       openai:
         optional: true
 
+  leac@0.6.0:
+    resolution: {integrity: sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg==}
+
   leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
     engines: {node: '>=6'}
@@ -3455,6 +3471,9 @@ packages:
   parse5@7.1.2:
     resolution: {integrity: sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==}
 
+  parseley@0.12.1:
+    resolution: {integrity: sha512-e6qHKe3a9HWr0oMRVDTRhKce+bRO8VGQR3NyVwcjwrbhMmFCX9KszEV35+rn4AdilFAq9VPxP/Fe1wC9Qjd2lw==}
+
   parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
@@ -3487,6 +3506,9 @@ packages:
   path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
+
+  peberminta@0.9.0:
+    resolution: {integrity: sha512-XIxfHpEuSJbITd1H3EeQwpcZbTLHc+VVr8ANI9t5sit565tsI4/xK3KWTUFE2e6QiangUkh3B0jihzmGnNrRsQ==}
 
   picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
@@ -3681,6 +3703,9 @@ packages:
   schema-utils@3.3.0:
     resolution: {integrity: sha512-pN/yOAvcC+5rQ5nERGuwrjLlYvLTbCibnZ1I7B1LaiAz9BRBlE9GMgE/eqV30P7aJQUf7Ddimy/RsbYO/GrVGg==}
     engines: {node: '>= 10.13.0'}
+
+  selderee@0.11.0:
+    resolution: {integrity: sha512-5TF+l7p4+OsnP8BCCvSyZiSPc4x4//p5uPwK8TCnVPJYRmU2aYKMpOXvw8zM5a5JvuuCGN1jmsMwuU2W02ukfA==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -4870,11 +4895,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@langchain/baidu-qianfan@0.0.1(@babel/core@7.24.7)(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/baidu-qianfan@0.0.1(@babel/core@7.24.7)(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
       '@baiducloud/qianfan': 0.1.0(@babel/core@7.24.7)
-      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
     transitivePeerDependencies:
@@ -4884,22 +4909,23 @@ snapshots:
       - openai
       - supports-color
 
-  '@langchain/community@0.2.14(axios@1.7.2)(cheerio@1.0.0-rc.12)(crypto-js@4.2.0)(lodash@4.17.21)(openai@4.52.1)':
+  '@langchain/community@0.2.14(axios@1.7.2)(cheerio@1.0.0-rc.12)(crypto-js@4.2.0)(html-to-text@9.0.5)(lodash@4.17.21)(openai@4.52.1)':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.1.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.1.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))
       binary-extensions: 2.3.0
       expr-eval: 2.0.2
       flat: 5.0.2
       js-yaml: 4.1.0
-      langchain: 0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1)
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      langchain: 0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       uuid: 9.0.1
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
     optionalDependencies:
       cheerio: 1.0.0-rc.12
       crypto-js: 4.2.0
+      html-to-text: 9.0.5
       lodash: 4.17.21
     transitivePeerDependencies:
       - '@gomomento/sdk-web'
@@ -4911,13 +4937,13 @@ snapshots:
       - peggy
       - pyodide
 
-  '@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -4929,13 +4955,13 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -4947,9 +4973,9 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/openai@0.0.34(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))':
+  '@langchain/openai@0.0.34(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
       openai: 4.52.1
       zod: 3.23.8
@@ -4958,9 +4984,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/openai@0.1.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))':
+  '@langchain/openai@0.1.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
       openai: 4.52.1
       zod: 3.23.8
@@ -4969,9 +4995,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/openai@0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))':
+  '@langchain/openai@0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
       openai: 4.52.1
       zod: 3.23.8
@@ -4980,17 +5006,17 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
       - openai
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)':
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
@@ -5269,6 +5295,11 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.18.0':
     optional: true
+
+  '@selderee/plugin-htmlparser2@0.11.0':
+    dependencies:
+      domhandler: 5.0.3
+      selderee: 0.11.0
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -6509,6 +6540,14 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
+  html-to-text@9.0.5:
+    dependencies:
+      '@selderee/plugin-htmlparser2': 0.11.0
+      deepmerge: 4.3.1
+      dom-serializer: 2.0.0
+      htmlparser2: 8.0.2
+      selderee: 0.11.0
+
   htmlparser2@8.0.2:
     dependencies:
       domelementtype: 2.3.0
@@ -7051,17 +7090,17 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1):
+  langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1):
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.0.34(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.0.34(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -7072,21 +7111,22 @@ snapshots:
     optionalDependencies:
       axios: 1.7.2
       cheerio: 1.0.0-rc.12
+      html-to-text: 9.0.5
     transitivePeerDependencies:
       - encoding
       - openai
 
-  langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1):
+  langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1):
     dependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
-      '@langchain/openai': 0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
+      '@langchain/openai': 0.1.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
+      langsmith: 0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -7097,13 +7137,14 @@ snapshots:
     optionalDependencies:
       axios: 1.7.2
       cheerio: 1.0.0-rc.12
+      html-to-text: 9.0.5
     transitivePeerDependencies:
       - encoding
       - openai
 
   langchainhub@0.0.11: {}
 
-  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1):
+  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -7111,11 +7152,11 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
-      langchain: 0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
+      langchain: 0.2.3(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1)
       openai: 4.52.1
 
-  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1):
+  langsmith@0.1.32(@langchain/core@0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1))(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -7123,9 +7164,11 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1))(openai@4.52.1)
-      langchain: 0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(openai@4.52.1)
+      '@langchain/core': 0.2.10(langchain@0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1))(openai@4.52.1)
+      langchain: 0.2.7(axios@1.7.2)(cheerio@1.0.0-rc.12)(html-to-text@9.0.5)(openai@4.52.1)
       openai: 4.52.1
+
+  leac@0.6.0: {}
 
   leven@3.1.0: {}
 
@@ -7434,6 +7477,11 @@ snapshots:
     dependencies:
       entities: 4.5.0
 
+  parseley@0.12.1:
+    dependencies:
+      leac: 0.6.0
+      peberminta: 0.9.0
+
   parseurl@1.3.3: {}
 
   path-exists@4.0.0: {}
@@ -7454,6 +7502,8 @@ snapshots:
   path-to-regexp@3.2.0: {}
 
   path-type@4.0.0: {}
+
+  peberminta@0.9.0: {}
 
   picocolors@1.0.1: {}
 
@@ -7646,6 +7696,10 @@ snapshots:
       '@types/json-schema': 7.0.15
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
+
+  selderee@0.11.0:
+    dependencies:
+      parseley: 0.12.1
 
   semver@6.3.1: {}
 

@@ -19,7 +19,7 @@ export class ModelConfigService {
     }),
     Ollama: () => ({
       baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-      model: process.env.OLLAMA_MODEL || 'qwen2:1.5b',
+      model: process.env.OLLAMA_MODEL || 'qwen2:72b',
     }),
     QianFan: () => ({
       model: 'ERNIE-Speed-128K',
