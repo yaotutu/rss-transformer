@@ -1,0 +1,42 @@
+{
+  "$": {
+    "xmlns:atom": "http://www.w3.org/2005/Atom",
+    "version": "2.0"
+  },
+  "channel": {
+    "title": "Articles",
+    "link": "https://web.dev/articles",
+    "atom:link": {
+      "$": {
+        "href": "http://rsshub.app/web/articles?responseType=arraybuffer",
+        "rel": "self",
+        "type": "application/rss+xml"
+      }
+    },
+    "description": "Articles - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)",
+    "generator": "RSSHub",
+    "webMaster": "i@diygod.me (DIYgod)",
+    "language": "en",
+    "image": {
+      "url": "https://web.dev/_pwa/web/icons/icon-144x144.png",
+      "title": "Articles",
+      "link": "https://web.dev/articles"
+    },
+    "lastBuildDate": "Thu, 04 Jul 2024 08:31:05 GMT",
+    "ttl": "180",
+    "item": [
+      {
+        "title": "Measure and debug performance with Google Analytics 4 and BigQuery",
+        "description": "<p>学习如何将 Web Vitals 数据发送到 Google Analytics 4 属性，并导出数据以供在 BigQuery 和 Looker Studio 中分析。</p>\n\n<p>Google 提供了多种工具-<a href=\"https://support.google.com/webmasters/answer/9205520\">搜索\n控制台</a>，<a href=\"https://pagespeed.web.dev/\">PageSpeed\nInsights</a> (PSI) 和\n<a href=\"https://developer.chrome.com/docs/crux\">Chrome 用户体验\n报告</a>\n(CrUX) -，让开发者看到他们的网站在<a href=\"https://web.dev/articles/vitals#core-web-vitals\">核心 Web\nVitals</a> 指标方面如何针对真实用户<a href=\"https://web.dev/articles/user-centric-performance-metrics#field\">在实\n际环境中</a>运行。</p>\n\n<p>这些工具非常好，因为它们可以为您提供站点的整体的真实用户性能视图，并且它们不需要任何设置即可开始使用。</p><p>然而，以下是几个关键原因，说明为什么不应仅依赖这些工具来测量您的网站性能：</p>\n\n<ul>\n<li>基于CrUX的工具会报告每月或上一个28天的数据。这意味着在进行任何更改后，您必须等待很长时间才能看到结果。</li>\n<li>基于CrUX的工具只能根据一些有限的维度进行分割，例如国家、连接类型和设备类别（桌面或移动设备）。您无法根据您业务的特定维度切片数据（例如：参与的用户、处于特定实验组的用户等）。</li>\n<li>基于CrUX的工具可以告诉您您的性能是如何的，但无法告诉您为什么。使用分析工具，您可以发送附加数据来帮助您追踪和调试问题。</li>\n</ul><p>出于这些原因，我们建议所有网站所有者使用现有的分析工具来监控核心网络性能指标。本文将解释如何使用谷歌提供的免费工具来实现这一目标。</p>\n\n<p>设置完成后，您将能够创建如下的仪表板：</p>请输入要翻译的文本：<p>如果您想对这里概述的所有步骤进行可视化概览，请查看我们在Google I/O '21的演讲：<a href=\"https://www.youtube.com/watch?v=xg47r3Y6K8I\">链接</a></p>\n\n<p><devsite-video video-id=\"xg47r3Y6K8I\"></devsite-video></p>\n\n<h2 id=\"measure\" data-text=\"测量\" tabindex=\"-1\">测量</h2>\n\n<p>使用Google Analytics一直可以通过<a href=\"https://support.google.com/analytics/answer/2709829\">自定义指标</a>进行性能测量，但是<a href=\"https://support.google.com/analytics/answer/10089681\">Google Analytics 4</a>（GA4）中有一些新功能，开发人员尤其应该感到兴奋。</p>\n\n<ul>\n<li>零配置，<a href=\"https://developers.google.com/analytics/devguides/collection/ga4/events#custom_events\">自定义事件</a>参数</li>\n<li>免费的<a href=\"https://support.google.com/analytics/answer/9358801\">BigQuery导出</a>，这样您就可以使用SQL查询数据</li>",
+        "link": "https://web.dev/articles/vitals-ga4?hl=en",
+        "guid": {
+          "_": "https://web.dev/articles/vitals-ga4?hl=en",
+          "$": {
+            "isPermaLink": "false"
+          }
+        },
+        "pubDate": "Wed, 19 Jun 2024 07:00:00 GMT"
+      }
+    ]
+  }
+}

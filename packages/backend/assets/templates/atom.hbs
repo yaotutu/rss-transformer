@@ -1,0 +1,19 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  {{#each this}}
+    <{{@key}} {{#each this.$}}{{@key}}="{{this}}"{{/each}}>
+      {{#if this._}}
+        <![CDATA[{{this._}}]]>
+      {{else}}
+        {{#each this}}
+          <{{@key}} {{#each this.$}}{{@key}}="{{this}}"{{/each}}>
+            {{#if this._}}
+              <![CDATA[{{this._}}]]>
+            {{else}}
+              {{this}}
+            {{/if}}
+          </{{@key}}>
+        {{/each}}
+      {{/if}}
+    </{{@key}}>
+  {{/each}}
+</feed>
