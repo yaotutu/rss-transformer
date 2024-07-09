@@ -50,7 +50,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
       rssSourceUrl,
       rssItemTag,
     } = createTaskDto;
-    if (!createTaskDto.taskData || !taskMapping[taskType]) {
+    if (!createTaskDto.taskData && !taskMapping[taskType]) {
       this.handleError('taskData or taskType is not provided', null, false);
       // return "taskData or taskType is not provided";
     }
@@ -166,7 +166,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
   // Method to add a cron job for a task
   private addCronJob(task: DbTask, immediate: boolean) {
-    const { rssSourceId, rssSourceUrl, id } = task;
+    const { id } = task;
     const jobName = `task_${task.id}`;
 
     // Check if the job already exists
@@ -181,18 +181,11 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
     // Callback function for the cron job
     const jobCallback = async () => {
       this.winstonService.debug('TASK', `Running task: ${task.name}`);
-      // 执行xxx任务携带的必要信息
-      const data = {
-        taskData: JSON.parse(task.taskData),
-        taskType: task.taskType,
-      };
-      // const data = JSON.parse(task.taskData); // Parse task data
-
       // Retrieve the task instance from registry and execute
       const taskInstance = this.taskRegistry.getTask(task.functionName);
       if (taskInstance) {
         try {
-          await taskInstance.execute(data, rssSourceId, rssSourceUrl, id); // Execute task
+          await taskInstance.execute(id); // Execute task
         } catch (error) {
           this.handleError('Failed to execute task', error);
         }
@@ -234,16 +227,15 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
   // Method to execute an immediate task
   private async executeImmediateTask(task: DbTask) {
-    const { rssSourceId, rssSourceUrl, id } = task;
+    const { id } = task;
     try {
       // Update task status to 'running'
       await this.taskPrismaService.updateTaskStatus(task.id, 'running');
 
       // Parse task data and execute task
-      const data = JSON.parse(task.taskData);
       const taskInstance = this.taskRegistry.getTask(task.functionName);
       if (taskInstance) {
-        await taskInstance.execute(data, rssSourceId, rssSourceUrl, id);
+        await taskInstance.execute(id);
       }
 
       // Update task status to 'completed' and set immediate to false

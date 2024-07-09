@@ -1,0 +1,25 @@
+<rss version="2.0">
+  <channel>
+    {{#each this}}
+      {{#if @root[@key]}}
+        {{@key}}<![CDATA[{{this}}]]>{{/key}}
+      {{else}}
+        <{{@key}}>
+          {{#if this._}}
+            <![CDATA[{{this._}}]]>
+          {{else}}
+            {{#each this}}
+              <{{@key}} {{#each this.$}}{{@key}}="{{this}}"{{/each}}>
+                {{#if this._}}
+                  <![CDATA[{{this._}}]]>
+                {{else}}
+                  {{this}}
+                {{/if}}
+              </{{@key}}>
+            {{/each}}
+          {{/if}}
+        </{{@key}}>
+      {{/if}}
+    {{/each}}
+  </channel>
+</rss>

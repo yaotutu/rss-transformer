@@ -23,6 +23,7 @@ export type LogType =
   | 'UPDATE_RSS_ITEMS'
   | 'MODEL_FACTORY'
   | 'MODEL_CONFIG'
+  | 'HTML_SPLIT'
   | 'PARSER_RSS_TO_JSON';
 
 export type tsakType = 'TRANSLATE' | 'UPDATE_RSS_ITEMS';
@@ -35,10 +36,5 @@ export type taskStatus =
   | 'NOT_STARTED';
 
 export interface Task {
-  execute(
-    data: any,
-    rssSourceId: number,
-    rssSourceUrl: string,
-    taskId: number,
-  ): Promise<any>;
+  execute(taskId: number): Promise<any>;
 }

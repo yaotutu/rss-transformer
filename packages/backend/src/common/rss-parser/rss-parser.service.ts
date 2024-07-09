@@ -1,14 +1,18 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import * as xml2js from 'xml2js';
-import { LogType } from 'src/types';
+import { Injectable } from '@nestjs/common';
 import * as iconv from 'iconv-lite';
+import { LogType } from 'src/types';
+import * as xml2js from 'xml2js';
 import { ErrorHandlingService } from '../exceptions/error-handling.service';
+import { HttpClientService } from '../http-client/http-client.service';
 
 @Injectable()
 export class RssParserService {
   private readonly parser: xml2js.Parser;
 
-  constructor(private readonly errorHandlingService: ErrorHandlingService) {
+  constructor(
+    private readonly errorHandlingService: ErrorHandlingService,
+    private readonly httpClientService: HttpClientService,
+  ) {
     this.parser = new xml2js.Parser({ explicitArray: false, trim: false });
   }
 
@@ -46,24 +50,61 @@ export class RssParserService {
    * @param {string} url - The URL of the RSS feed.
    * @returns {Promise<string>} - A promise that resolves with the fetched XML data.
    */
+  // private async fetchRssData(url: string): Promise<string> {
+  //   const response = await fetch(url);
+  //   if (!response.ok) {
+  //     throw new Error(`Failed to fetch RSS feed. Status: ${response.status}`);
+  //   }
+  //   const buffer = await response.arrayBuffer();
+  //   const bufferStr = Buffer.from(buffer);
+
+  //   // Check encoding and decode
+  //   const encodingMatch = bufferStr
+  //     .toString()
+  //     .match(/<\?xml.*encoding="(.*?)".*\?>/);
+  //   const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : 'utf-8';
+
+  //   if (encoding === 'gb2312') {
+  //     return iconv.decode(bufferStr, 'gb2312');
+  //   } else {
+  //     return bufferStr.toString('utf-8');
+  //   }
+  // }
+  /**
+   * Fetches the RSS feed data from the provided URL.
+   * @param {string} url - The URL of the RSS feed.
+   * @returns {Promise<string>} - A promise that resolves with the fetched XML data as a string.
+   * @throws {Error} - Throws an error if the fetch fails or if there's an issue with decoding.
+   */
   private async fetchRssData(url: string): Promise<string> {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch RSS feed. Status: ${response.status}`);
-    }
-    const buffer = await response.arrayBuffer();
-    const bufferStr = Buffer.from(buffer);
+    try {
+      // Fetch the raw data as ArrayBuffer
+      const response = await this.httpClientService.get<ArrayBuffer>(
+        url,
+        true,
+        {
+          responseType: 'arraybuffer',
+        },
+      );
 
-    // Check encoding and decode
-    const encodingMatch = bufferStr
-      .toString()
-      .match(/<\?xml.*encoding="(.*?)".*\?>/);
-    const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : 'utf-8';
+      const bufferStr = Buffer.from(response);
 
-    if (encoding === 'gb2312') {
-      return iconv.decode(bufferStr, 'gb2312');
-    } else {
-      return bufferStr.toString('utf-8');
+      // Detect the encoding from the XML declaration
+      const encodingMatch = bufferStr
+        .toString()
+        .match(/<\?xml.*encoding="(.*?)".*\?>/);
+      const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : 'utf-8';
+
+      // Decode the buffer using the detected encoding
+      if (encoding === 'gb2312') {
+        return iconv.decode(bufferStr, 'gb2312');
+      } else {
+        return bufferStr.toString('utf-8');
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch or decode RSS feed from ${url}. ${error.message}`,
+      );
     }
   }
 

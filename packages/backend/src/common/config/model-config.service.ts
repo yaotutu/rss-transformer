@@ -1,6 +1,6 @@
 // src/config/model-config.service.ts
 
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ApiException } from '../dto/common.dto';
 import { WinstonService } from '../logger/winston.service';
 
@@ -18,8 +18,11 @@ export class ModelConfigService {
       azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
     }),
     Ollama: () => ({
-      baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-      model: process.env.OLLAMA_MODEL || 'qwen2:1.5b',
+      baseUrl: process.env.OLLAMA_BASE_URL || 'http://192.168.60.119:11434/',
+      model: process.env.OLLAMA_MODEL || 'qwen2',
+    }),
+    QianFan: () => ({
+      model: 'ERNIE-Speed-128K',
     }),
     // Add more model configs here as needed
   };

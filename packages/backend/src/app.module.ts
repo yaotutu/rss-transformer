@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RssModule } from './rss/rss.module';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { CommonModule } from './common/common.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { RssModule } from './rss/rss.module';
 import { TaskModule } from './task/task.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { TransformeredModule } from './transformed/transformed.module';
 
 @Module({

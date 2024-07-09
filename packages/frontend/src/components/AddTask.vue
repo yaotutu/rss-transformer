@@ -1,3 +1,18 @@
+/** * Component: AddTask * Description: This component is used to add a new task
+based on an RSS source. * Before adding a task, an RSS source needs to be added
+first. * The component allows users to input task details such as task name, RSS
+source, tags, schedule, task type, immediate execution, and task data. * Users
+can also refresh the RSS source list and submit the task for creation or update.
+* * Props: * - rssSourceUrlOptions: An array of options for the RSS source URLs.
+* * Events: * - taskAdded: Triggered when a task is added or updated. * *
+Methods: * - handleTaskSubmit: Handles the submission of the task form based on
+the specified action (add or edit). * - isJsonString: Validates the JSON string
+format of the task data. * * Computed Properties: * - rssItemTagOptions:
+Retrieves the RSS item tags based on the selected RSS source URL. * * Data: * -
+taskForm: An object that holds the form data for the task, including task
+details and task data. * * Styles: * - .task-wrap: Styles the component wrapper
+with a flex layout. * - .header: Styles the header section with a flex layout.
+*/
 <template>
   <div class="task-wrap">
     <div class="header">
@@ -102,6 +117,12 @@
   </div>
 </template>
 
+/** * This component represents the form for adding a new task. * It allows the
+user to input various details such as the RSS source URL, * task name, schedule,
+task type, function name, immediate flag, RSS item tags, * and task data. * *
+@component AddTask * @props {Array} rssSourceUrlOptions - The options for the
+RSS source URL. * @emits {taskAdded} - Event emitted when a task is added. */
+
 <script setup>
 import { taskController } from '@/services/api';
 import { reactive, computed } from 'vue';
@@ -144,7 +165,7 @@ const taskForm = reactive({
   taskData: '',
   immediate: undefined,
   rssItemTag: [],
-  taskData: '{}',
+  taskData: null,
 });
 
 const handleTaskSubmit = (action) => {
@@ -158,11 +179,6 @@ const handleTaskSubmit = (action) => {
     rssItemTag,
     taskData,
   } = taskForm;
-
-  if (!isJsonString(taskData)) {
-    alert('任务数据必须是json字符串,必须包含functionName与taskData属性');
-    return;
-  }
 
   const rssSourceId = props.rssSourceUrlOptions.find(
     (item) => item.value === rssSourceUrl,
