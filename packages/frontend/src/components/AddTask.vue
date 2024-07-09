@@ -122,9 +122,7 @@ user to input various details such as the RSS source URL, * task name, schedule,
 task type, function name, immediate flag, RSS item tags, * and task data. * *
 @component AddTask * @props {Array} rssSourceUrlOptions - The options for the
 RSS source URL. * @emits {taskAdded} - Event emitted when a task is added. */
-<script setup>
-// ... existing code ...
-</script>
+
 <script setup>
 import { taskController } from '@/services/api';
 import { reactive, computed } from 'vue';
