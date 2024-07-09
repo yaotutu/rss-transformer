@@ -1,7 +1,7 @@
 // src/task-mapping.ts
 export const taskMapping = {
   TRANSLATE: {
-    functionName: 'genericLlm',
+    functionName: 'translateTask',
     taskData: {
       model: 'OpenAI',
       originLang: '英文',

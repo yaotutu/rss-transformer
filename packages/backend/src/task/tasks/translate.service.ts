@@ -6,7 +6,7 @@ import { TaskPrismaService } from 'src/common/prisma/task-prisma.service';
 import { Task } from 'src/types';
 
 @Injectable()
-export class GenericLlmTask implements Task {
+export class TranslateTask implements Task {
   constructor(
     private rssPrismaService: RssPrismaService,
     private taskPrismaService: TaskPrismaService,
@@ -15,19 +15,17 @@ export class GenericLlmTask implements Task {
 
   async execute(taskId: number): Promise<void> {
     const taskInfo = await this.taskPrismaService.getTaskById(taskId);
-    const { taskData, taskType, rssItemTag, rssSourceUrl } = taskInfo;
+    const { taskData, rssItemTag, rssSourceUrl } = taskInfo;
     let handleTaskExecution: (content: string) => Promise<string>;
 
-    if (taskType === 'TRANSLATE') {
-      const { originLang, targetLang } = JSON.parse(taskData);
-      handleTaskExecution = (data: string) => {
-        return this.langChainService.translateAndSplitParagraph(
-          data,
-          originLang,
-          targetLang,
-        );
-      };
-    }
+    const { originLang, targetLang } = JSON.parse(taskData);
+    handleTaskExecution = (data: string) => {
+      return this.langChainService.translateAndSplitParagraph(
+        data,
+        originLang,
+        targetLang,
+      );
+    };
 
     const rssItems = await this.rssPrismaService.getUniqueRssItems(
       taskId,
