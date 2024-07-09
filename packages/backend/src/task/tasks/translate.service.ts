@@ -1,6 +1,6 @@
 // src/task/tasks/sayHello.task.ts
 import { Injectable } from '@nestjs/common';
-import { LangchainService } from 'src/common/langchain/langchain.service';
+import { TranslateService } from 'src/common/langchain/translate.service';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { TaskPrismaService } from 'src/common/prisma/task-prisma.service';
 import { Task } from 'src/types';
@@ -10,7 +10,7 @@ export class TranslateTask implements Task {
   constructor(
     private rssPrismaService: RssPrismaService,
     private taskPrismaService: TaskPrismaService,
-    private langChainService: LangchainService,
+    private translateService: TranslateService,
   ) {}
 
   async execute(taskId: number): Promise<void> {
@@ -20,7 +20,7 @@ export class TranslateTask implements Task {
 
     const { originLang, targetLang } = JSON.parse(taskData);
     handleTaskExecution = (data: string) => {
-      return this.langChainService.translateAndSplitParagraph(
+      return this.translateService.translateAndSplitParagraph(
         data,
         originLang,
         targetLang,

@@ -8,15 +8,15 @@ import { ErrorHandlingService } from './exceptions/error-handling.service';
 import { FullContentService } from './full-content/full-content.service';
 import { HttpClientService } from './http-client/http-client.service';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
-import { LangchainService } from './langchain/langchain.service';
 import { ModelFactory } from './langchain/model-factory';
+import { TranslateService } from './langchain/translate.service';
 import { WinstonService } from './logger/winston.service';
 import { RssPrismaService } from './prisma/rss-prisma.service';
 import { TaskPrismaService } from './prisma/task-prisma.service';
+import { FeedGeneratorService } from './rss-parser/feed-generator.service';
 import { HtmlSplitterService } from './rss-parser/html-splitter.service';
 import { JsonToXmlService } from './rss-parser/json-to-xml.service';
 import { RssParserService } from './rss-parser/rss-parser.service';
-import { FeedGeneratorService } from './rss-parser/feed-generator.service';
 
 @Module({
   imports: [HttpModule],
@@ -27,7 +27,7 @@ import { FeedGeneratorService } from './rss-parser/feed-generator.service';
     RssPrismaService,
     TaskPrismaService,
     ErrorHandlingService,
-    LangchainService,
+    TranslateService,
     ConfigService,
     ModelFactory,
     ModelConfigService,
@@ -45,7 +45,7 @@ import { FeedGeneratorService } from './rss-parser/feed-generator.service';
     RssPrismaService,
     TaskPrismaService,
     ErrorHandlingService,
-    LangchainService,
+    TranslateService,
     ConfigService,
     ModelFactory,
     ModelConfigService,

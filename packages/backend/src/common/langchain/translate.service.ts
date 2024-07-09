@@ -5,7 +5,7 @@ import { HtmlSplitterService } from '../rss-parser/html-splitter.service';
 import { ModelFactory } from './model-factory';
 
 @Injectable()
-export class LangchainService {
+export class TranslateService {
   private model;
 
   constructor(
