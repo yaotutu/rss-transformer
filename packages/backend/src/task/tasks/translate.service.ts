@@ -7,19 +7,33 @@ import { Task } from 'src/types';
 
 @Injectable()
 export class TranslateTask implements Task {
+  handleTaskExecution: (content: string) => Promise<string>;
+
   constructor(
     private rssPrismaService: RssPrismaService,
     private taskPrismaService: TaskPrismaService,
     private translateService: TranslateService,
-  ) {}
+  ) {
+    this.handleTaskExecution = (content: string) => {
+      return this.translateService.translateAndSplitParagraph(
+        content,
+        'en',
+        'zh',
+      );
+    };
+  }
 
+  /**
+   * Executes the translation task for a given task ID.
+   * @param taskId - The ID of the task to execute.
+   * @returns A Promise that resolves to void.
+   */
   async execute(taskId: number): Promise<void> {
     const taskInfo = await this.taskPrismaService.getTaskById(taskId);
     const { taskData, rssItemTag, rssSourceUrl } = taskInfo;
-    let handleTaskExecution: (content: string) => Promise<string>;
 
     const { originLang, targetLang } = JSON.parse(taskData);
-    handleTaskExecution = (data: string) => {
+    this.handleTaskExecution = (data: string) => {
       return this.translateService.translateAndSplitParagraph(
         data,
         originLang,
@@ -39,64 +53,61 @@ export class TranslateTask implements Task {
     for (const item of rssItems) {
       const rssItemTagList = JSON.parse(rssItemTag);
       let rssItemInfo = JSON.parse(item.itemOriginInfo);
-      let finalRssItemInfo = rssItemInfo;
 
       for (const tag of rssItemTagList) {
-        const transedContent = rssItemInfo[tag];
-        let finalContent = '';
-        if (typeof transedContent === 'string') {
-          finalContent = transedContent;
-        } else {
-          finalContent = transedContent._;
-        }
-        const processedString = await handleTaskExecution(finalContent);
-        finalRssItemInfo = this.modifyTagContent(
-          finalRssItemInfo,
-          tag,
-          processedString,
-        );
+        const transedContent =
+          typeof rssItemInfo[tag] === 'string'
+            ? rssItemInfo[tag]
+            : rssItemInfo[tag]?._ ?? '';
+
+        const processedString = await this.handleTaskExecution(transedContent);
+        rssItemInfo = this.modifyTagContent(rssItemInfo, tag, processedString);
       }
 
-      const rssTransformedItem = {
-        rssItemId: item.id,
-        taskId: taskId,
-        uniqueArticleId: item.uniqueArticleId,
-        itemUrl: item.itemUrl,
-        itemTransformedInfo: JSON.stringify(finalRssItemInfo),
-      };
-
       await this.rssPrismaService.writeRssItemsToTransformed([
-        rssTransformedItem,
+        {
+          rssItemId: item.id,
+          taskId: taskId,
+          uniqueArticleId: item.uniqueArticleId,
+          itemUrl: item.itemUrl,
+          itemTransformedInfo: JSON.stringify(rssItemInfo),
+        },
       ]);
     }
   }
+
   /**
    * 修改指定标签的值
-   * @param {Object} item - 要修改的item对象
+   * @param {Object} itemInfo - 要修改的item对象
    * @param {string} tagName - 标签名称
    * @param {string} newValue - 新的值
    */
-  modifyTagContent(itemInfo, tagName, newValue) {
+  modifyTagContent(
+    itemInfo: Record<string, any>,
+    tagName: string,
+    newValue: string,
+  ): Record<string, any> {
     const item = JSON.parse(JSON.stringify(itemInfo));
+
     if (item[tagName]) {
-      const content = item[tagName];
-      if (Array.isArray(content)) {
-        content.forEach((element, index) => {
+      if (Array.isArray(item[tagName])) {
+        item[tagName] = item[tagName].map((element: any) => {
           if (typeof element === 'object' && element !== null) {
             if ('$' in element) {
-              element._ = newValue; // 如果有 $, 修改 _
+              element._ = newValue;
             } else {
-              item[tagName][index] = newValue; // 如果没有 $, 直接修改
+              element = newValue;
             }
           } else {
-            item[tagName][index] = newValue;
+            element = newValue;
           }
+          return element;
         });
-      } else if (typeof content === 'object' && content !== null) {
-        if ('$' in content) {
-          content._ = newValue; // 如果有 $, 修改 _
+      } else if (typeof item[tagName] === 'object' && item[tagName] !== null) {
+        if ('$' in item[tagName]) {
+          item[tagName]._ = newValue;
         } else {
-          item[tagName] = newValue; // 如果没有 $, 直接修改
+          item[tagName] = newValue;
         }
       } else {
         item[tagName] = newValue;
