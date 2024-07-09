@@ -18,8 +18,8 @@ export class ModelConfigService {
       azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
     }),
     Ollama: () => ({
-      baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-      model: process.env.OLLAMA_MODEL || 'qwen2:72b',
+      baseUrl: process.env.OLLAMA_BASE_URL || 'http://192.168.60.119:11434/',
+      model: process.env.OLLAMA_MODEL || 'qwen2',
     }),
     QianFan: () => ({
       model: 'ERNIE-Speed-128K',

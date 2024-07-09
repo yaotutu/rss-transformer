@@ -13,15 +13,9 @@ export class GenericLlmTask implements Task {
     private langChainService: LangchainService,
   ) {}
 
-  async execute(
-    data: any,
-    rssSourceId: number,
-    rssSourceUrl: string,
-    taskId: number,
-  ): Promise<void> {
-    // const { taskData, taskType } = data;
+  async execute(taskId: number): Promise<void> {
     const taskInfo = await this.taskPrismaService.getTaskById(taskId);
-    const { taskData, taskType, rssItemTag } = taskInfo;
+    const { taskData, taskType, rssItemTag, rssSourceUrl } = taskInfo;
     let handleTaskExecution: (content: string) => Promise<string>;
 
     if (taskType === 'TRANSLATE') {
@@ -34,52 +28,50 @@ export class GenericLlmTask implements Task {
         );
       };
     }
-    // 这里拿到的是去重过的数据，直接处理就好，不用关心是否重复
+
     const rssItems = await this.rssPrismaService.getUniqueRssItems(
       taskId,
       rssSourceUrl,
     );
 
-    // 如果没有数据，直接返回
     if (rssItems.length === 0) {
       return;
     }
-    const rssTransformedItems = await Promise.all(
-      rssItems.map(async (item) => {
-        const rssItemTagList = JSON.parse(rssItemTag);
-        // 原始数据
-        let rssItemInfo = JSON.parse(item.itemOriginInfo);
-        // 转换后的数据
-        let finalRssItemInfo = '';
-        await Promise.all(
-          rssItemTagList.map(async (tag) => {
-            const transedContent = rssItemInfo[tag];
-            let finalContent = '';
-            if (typeof transedContent === 'string') {
-              finalContent = transedContent;
-            } else {
-              finalContent = transedContent._;
-            }
-            const processedString = await handleTaskExecution(finalContent);
-            finalRssItemInfo = this.modifyTagContent(
-              rssItemInfo,
-              tag,
-              processedString,
-            );
-          }),
-        );
-        return {
-          rssItemId: item.id,
-          taskId: taskId,
-          uniqueArticleId: item.uniqueArticleId,
-          itemUrl: item.itemUrl,
-          itemTransformedInfo: JSON.stringify(finalRssItemInfo),
-        };
-      }),
-    );
-    this.rssPrismaService.writeRssItemsToTransformed(rssTransformedItems);
-  }
 
+    for (const item of rssItems) {
+      const rssItemTagList = JSON.parse(rssItemTag);
+      let rssItemInfo = JSON.parse(item.itemOriginInfo);
+      let finalRssItemInfo = rssItemInfo;
+
+      for (const tag of rssItemTagList) {
+        const transedContent = rssItemInfo[tag];
+        let finalContent = '';
+        if (typeof transedContent === 'string') {
+          finalContent = transedContent;
+        } else {
+          finalContent = transedContent._;
+        }
+        const processedString = await handleTaskExecution(finalContent);
+        finalRssItemInfo = this.modifyTagContent(
+          finalRssItemInfo,
+          tag,
+          processedString,
+        );
+      }
+
+      const rssTransformedItem = {
+        rssItemId: item.id,
+        taskId: taskId,
+        uniqueArticleId: item.uniqueArticleId,
+        itemUrl: item.itemUrl,
+        itemTransformedInfo: JSON.stringify(finalRssItemInfo),
+      };
+
+      await this.rssPrismaService.writeRssItemsToTransformed([
+        rssTransformedItem,
+      ]);
+    }
+  }
   /**
    * 修改指定标签的值
    * @param {Object} item - 要修改的item对象
