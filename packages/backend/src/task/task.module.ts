@@ -6,6 +6,7 @@ import { TaskPrismaService } from 'src/common/prisma/task-prisma.service';
 import { TaskController } from './task.controller';
 import { TaskRegistry } from './task.registry';
 import { TaskService } from './task.service';
+import { SummarizeTask } from './tasks/summarize.service';
 import { TranslateTask } from './tasks/translate.service';
 
 @Module({
@@ -17,6 +18,7 @@ import { TranslateTask } from './tasks/translate.service';
     WinstonService,
     ErrorHandlingService,
     TranslateTask,
+    SummarizeTask,
   ],
   controllers: [TaskController],
 })

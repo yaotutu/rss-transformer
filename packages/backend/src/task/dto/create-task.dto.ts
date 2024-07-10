@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsIn, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
 import { TaskDataWrapperDto } from './translate-task-data-wrapper.dto';
 
 export class CreateTaskDto {
@@ -22,10 +22,10 @@ export class CreateTaskDto {
     description:
       '任务类型，例如：rss的翻译、rss的总结,"TRANSLATE" | "UPDATE_RSS_ITEMS"',
     example: 'TRANSLATE',
-    enum: ['TRANSLATE', 'UPDATE_RSS_ITEMS', 'CUSTOM'],
+    enum: ['TRANSLATE', 'UPDATE_RSS_ITEMS', 'CUSTOM', 'SUMMRIZE'],
   })
   @IsNotEmpty()
-  @IsIn(['TRANSLATE', 'UPDATE_RSS_ITEMS', 'CUSTOM'])
+  @IsIn(['TRANSLATE', 'UPDATE_RSS_ITEMS', 'CUSTOM', 'SUMMRIZE'])
   readonly taskType: string;
 
   @ApiProperty({

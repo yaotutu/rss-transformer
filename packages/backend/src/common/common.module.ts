@@ -17,6 +17,7 @@ import { FeedGeneratorService } from './rss-parser/feed-generator.service';
 import { HtmlSplitterService } from './rss-parser/html-splitter.service';
 import { JsonToXmlService } from './rss-parser/json-to-xml.service';
 import { RssParserService } from './rss-parser/rss-parser.service';
+import { TextUtilsService } from './utils/text-utils.service';
 
 @Module({
   imports: [HttpModule],
@@ -37,6 +38,7 @@ import { RssParserService } from './rss-parser/rss-parser.service';
     HtmlSplitterService,
     FullContentService,
     FeedGeneratorService,
+    TextUtilsService,
   ],
   exports: [
     ResponseInterceptor,
@@ -54,6 +56,7 @@ import { RssParserService } from './rss-parser/rss-parser.service';
     HtmlSplitterService,
     FullContentService,
     FeedGeneratorService,
+    TextUtilsService,
   ],
 })
 export class CommonModule {}

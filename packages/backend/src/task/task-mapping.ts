@@ -16,5 +16,11 @@ export const taskMapping = {
       filterKeywords: [],
     },
   },
+  SUMMRIZE: {
+    functionName: 'summarizeTask',
+    taskData: {
+      model: 'OpenAI',
+    },
+  },
   // Add more mappings as needed
 };
