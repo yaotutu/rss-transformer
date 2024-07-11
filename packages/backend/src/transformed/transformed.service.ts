@@ -20,4 +20,13 @@ export class TransformedService {
       isRss: true,
     });
   }
+
+  async generateSummarizedByTaskId(id: number): Promise<ApiResponse<string>> {
+    const { rssJson, feedType } =
+      await this.rssPrismaService.getTransformedRssByTaskId(id);
+    const xml = this.feedGeneratorService.generateFeed(rssJson, feedType);
+    return new ApiResponse<string>(200, 'Success', xml, undefined, {
+      isRss: true,
+    });
+  }
 }

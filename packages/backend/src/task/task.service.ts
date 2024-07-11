@@ -16,7 +16,7 @@ import { TaskRegistry } from './task.registry';
 export class TaskService implements OnModuleInit, OnModuleDestroy {
   private currentTasks = new Map<number, string>(); // Map to store current tasks and their job names
   private scheduledJobs = new Map<number, CronJob>(); // Map to store scheduled jobs
-
+  private taskExecutionStates = new Map<number, boolean>(); // 任务ID与执行状态的映射
   constructor(
     private taskPrismaService: TaskPrismaService,
     private schedulerRegistry: SchedulerRegistry,
@@ -167,7 +167,7 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
   // Method to add a cron job for a task
   private addCronJob(task: DbTask, immediate: boolean) {
     const { id } = task;
-    const jobName = `task_${task.id}`;
+    const jobName = `task_${task.functionName}_${id}`;
 
     // Check if the job already exists
     if (this.schedulerRegistry.doesExist('cron', jobName)) {
@@ -180,6 +180,16 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
     // Callback function for the cron job
     const jobCallback = async () => {
+      this.winstonService.debug('TASK', `Running job: ${jobName},jobCallback`);
+      this.winstonService.debug('TASK', `${this.taskExecutionStates.get(id)}`);
+      if (this.taskExecutionStates.get(id)) {
+        this.winstonService.warn(
+          'TASK',
+          `Task ${id}/${jobName} is already running, skipping.`,
+        );
+        return; // 如果任务已经在执行，跳过本次执行
+      }
+      this.taskExecutionStates.set(id, true); // 设置任务执行状态为正在执行
       this.winstonService.debug('TASK', `Running task: ${task.name}`);
       // Retrieve the task instance from registry and execute
       const taskInstance = this.taskRegistry.getTask(task.functionName);
@@ -188,6 +198,8 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
           await taskInstance.execute(id); // Execute task
         } catch (error) {
           this.handleError('Failed to execute task', error);
+        } finally {
+          this.taskExecutionStates.set(id, false); // Reset task execution state
         }
       } else {
         this.winstonService.error('TASK', `Unknown task: ${task.functionName}`);
@@ -205,9 +217,9 @@ export class TaskService implements OnModuleInit, OnModuleDestroy {
 
     // Register the cron job and start it
     this.schedulerRegistry.addCronJob(jobName, cronJob);
-    if (!immediate) {
-      cronJob.start();
-    }
+    // if (!immediate) {
+    //   cronJob.start();
+    // }
 
     // Track the current tasks and scheduled jobs
     this.currentTasks.set(task.id, jobName);

@@ -9,6 +9,7 @@ import { FullContentService } from './full-content/full-content.service';
 import { HttpClientService } from './http-client/http-client.service';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { ModelFactory } from './langchain/model-factory';
+import { SummarizeService } from './langchain/summarize.setvice';
 import { TranslateService } from './langchain/translate.service';
 import { WinstonService } from './logger/winston.service';
 import { RssPrismaService } from './prisma/rss-prisma.service';
@@ -39,6 +40,7 @@ import { TextUtilsService } from './utils/text-utils.service';
     FullContentService,
     FeedGeneratorService,
     TextUtilsService,
+    SummarizeService,
   ],
   exports: [
     ResponseInterceptor,
@@ -57,6 +59,7 @@ import { TextUtilsService } from './utils/text-utils.service';
     FullContentService,
     FeedGeneratorService,
     TextUtilsService,
+    SummarizeService,
   ],
 })
 export class CommonModule {}

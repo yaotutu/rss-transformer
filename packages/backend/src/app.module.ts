@@ -9,6 +9,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { RssModule } from './rss/rss.module';
 import { TaskModule } from './task/task.module';
 import { TransformeredModule } from './transformed/transformed.module';
+import { TaskStateService } from './task/task-state.service';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TransformeredModule } from './transformed/transformed.module';
   controllers: [AppController],
   providers: [
     AppService,
+    TaskStateService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,

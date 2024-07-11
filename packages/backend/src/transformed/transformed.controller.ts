@@ -13,4 +13,10 @@ export class TransformeredController {
   getTransformered(@Param('id', ParseIntPipe) id: number) {
     return this.transformeredService.generateTransformedByTaskId(id);
   }
+
+  // sum/id
+  @Get('sum/:id')
+  getSummarized(@Param('id', ParseIntPipe) id: number) {
+    return this.transformeredService.generateSummarizedByTaskId(id);
+  }
 }
