@@ -9,7 +9,7 @@ export class TextUtilsService {
    * @param maxLength The maximum length of each group of sentences.
    * @returns An array of strings, where each string is a group of sentences.
    */
-  splitTextByLanguage(text: string, maxLength: number = 1000): string[] {
+  splitTextByLanguage(text: string, maxLength: number = 2000): string[] {
     const delimiter = this.isChinese(text) ? '。' : '.';
     const sentences = this.splitText(text, delimiter);
     const groups = this.assembleSentences(sentences, maxLength);
@@ -29,7 +29,7 @@ export class TextUtilsService {
     let chineseCount = 0;
     let englishCount = 0;
 
-    for (let char of text) {
+    for (const char of text) {
       if (chineseCharRegex.test(char)) {
         chineseCount++;
       } else if (englishCharRegex.test(char)) {
@@ -95,7 +95,7 @@ export class TextUtilsService {
     let currentGroup: string = '';
     let currentLength = 0;
 
-    for (let sentence of sentences) {
+    for (const sentence of sentences) {
       const sentenceLength = sentence.length;
       if (sentenceLength > maxLength) {
         // If a single sentence exceeds maxLength, split it into smaller chunks

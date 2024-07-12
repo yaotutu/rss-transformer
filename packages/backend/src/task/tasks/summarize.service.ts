@@ -55,7 +55,7 @@ export class SummarizeTask implements Task {
         } else {
           tag = 'description';
         }
-        let rssItemInfo = JSON.parse(item.itemOriginInfo);
+        const rssItemInfo = JSON.parse(item.itemOriginInfo);
         const targetContent =
           typeof rssItemInfo[tag] === 'string'
             ? rssItemInfo[tag]
@@ -71,26 +71,36 @@ export class SummarizeTask implements Task {
         const splitText =
           this.textUtilsService.splitTextByLanguage(plainTextContent);
         this.winstonService.info('TASK', `Split text: ${splitText}`);
-        const finalContent: string[] = [];
+        const finalContent = {} as SummarizeResult;
+        let isSuccess = true;
         for (const text of splitText) {
           const summarizedText = await this.summarizeService.summarize(text);
-          finalContent.push(summarizedText);
+          const summarizedTextObj = JSON.parse(
+            summarizedText,
+          ) as SummarizeResult;
+          if (summarizedTextObj.status === 'success') {
+            finalContent.title = rssItemInfo.title;
+            finalContent.summary = summarizedTextObj.summary;
+            finalContent.key_points = summarizedTextObj.key_points;
+            finalContent.tags = summarizedTextObj.tags;
+            finalContent.status = 'success';
+          } else {
+            isSuccess = false;
+            break;
+          }
         }
-        const isAllSuccess = finalContent.every((content) => {
-          const summarizedTextObj = JSON.parse(content) as SummarizeResult;
-          return summarizedTextObj.status === 'success';
-        });
-        if (isAllSuccess) {
-          this.rssPrismaService.writeRssItemsToTransformed([
-            {
-              rssItemId: item.id,
-              taskId: taskId,
-              uniqueArticleId: item.uniqueArticleId,
-              itemUrl: item.itemUrl,
-              itemTransformedInfo: JSON.stringify(finalContent),
-            },
-          ]);
+        if (!isSuccess) {
+          continue; // Skip writing the RSS item if there was an error
         }
+        this.rssPrismaService.writeRssItemsToTransformed([
+          {
+            rssItemId: item.id,
+            taskId: taskId,
+            uniqueArticleId: item.uniqueArticleId,
+            itemUrl: item.itemUrl,
+            itemTransformedInfo: JSON.stringify(finalContent),
+          },
+        ]);
       }
     } catch (error) {
       this.errorHandlingService.handleError(
