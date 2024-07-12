@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import React from 'react'; // Import the 'React' module
+
+import ReactDOMServer from 'react-dom/server';
 import { ApiResponse } from 'src/common/dto/common.dto';
 import { ErrorHandlingService } from 'src/common/exceptions/error-handling.service';
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { FeedGeneratorService } from 'src/common/rss-parser/feed-generator.service';
 import { JsonToXmlService } from 'src/common/rss-parser/json-to-xml.service';
+import Sum from 'src/jsx/Sum';
 
 @Injectable()
 export class TransformedService {
@@ -27,8 +31,17 @@ export class TransformedService {
     id: number,
   ): Promise<ApiResponse<string> | any> {
     try {
-      const res = await this.rssPrismaService.getSummarizedByTaskId(id);
-      console.log('🚀 ~ TransformedService ~ res:', res);
+      const summarized = await this.rssPrismaService.getSummarizedByTaskId(id);
+      console.log(React, 'react');
+      const jsxElement = React.createElement(Sum, { summarized });
+      const html = ReactDOMServer.renderToString(jsxElement);
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>${html}`;
+
+      return new ApiResponse<string>(200, 'Success', xml, undefined, {
+        isRss: true,
+      });
+
+      // console.log('🚀 ~ TransformedService ~ res:', res);
     } catch (error) {
       this.errorHandlingService.handleError(
         'DATABASE',

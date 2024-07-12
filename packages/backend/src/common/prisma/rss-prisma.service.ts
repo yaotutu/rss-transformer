@@ -363,7 +363,7 @@ export class RssPrismaService extends BasePrismaService {
 
   async getSummarizedByTaskId(
     taskId: number,
-  ): Promise<ApiResponse<string> | any> {
+  ): Promise<RssTransformed[] | ApiResponse<string>> {
     try {
       return await this.prisma.rssTransformed.findMany({
         where: { taskId },
