@@ -2,23 +2,19 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { Injectable } from '@nestjs/common';
 import console from 'node:console';
-import { HtmlSplitterService } from '../rss-parser/html-splitter.service';
 import { ModelFactory } from './model-factory';
 
 @Injectable()
 export class SummarizeService {
   private model;
 
-  constructor(
-    private modelFactory: ModelFactory,
-    private htmlSplitterService: HtmlSplitterService, // 注入 HtmlSplitterService
-  ) {}
+  constructor(private modelFactory: ModelFactory) {}
 
   async summarize(
     content: string,
     output_language: string = '简体中文',
   ): Promise<string> {
-    this.model = this.modelFactory.getModel('Ollama');
+    this.model = this.modelFactory.getModel('OpenAI');
     const prompt = ChatPromptTemplate.fromMessages([
       [
         'system',
@@ -59,7 +55,7 @@ export class SummarizeService {
       return result.trim(); // 返回翻译后的单段结果
     } catch (error) {
       console.error('Error summarizing content:', error);
-      if (error.cause.code === 'UND_ERR_HEADERS_TIMEOUT') {
+      if (error?.cause?.code === 'UND_ERR_HEADERS_TIMEOUT') {
         return JSON.stringify({
           title: '',
           summary: '',

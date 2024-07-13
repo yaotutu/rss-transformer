@@ -10,6 +10,7 @@ export class TextUtilsService {
    * @returns An array of strings, where each string is a group of sentences.
    */
   splitTextByLanguage(text: string, maxLength: number = 2000): string[] {
+    if (text.length <= maxLength) return [text];
     const delimiter = this.isChinese(text) ? '。' : '.';
     const sentences = this.splitText(text, delimiter);
     const groups = this.assembleSentences(sentences, maxLength);
@@ -91,31 +92,29 @@ export class TextUtilsService {
    * @returns An array of strings, where each string is a group of sentences.
    */
   private assembleSentences(sentences: string[], maxLength: number): string[] {
+    const totalLength = sentences.reduce(
+      (sum, sentence) => sum + sentence.length,
+      0,
+    );
+    const numGroups = Math.ceil(totalLength / maxLength);
+    const targetLength = Math.ceil(totalLength / numGroups);
+
     const groups: string[] = [];
     let currentGroup: string = '';
     let currentLength = 0;
 
     for (const sentence of sentences) {
       const sentenceLength = sentence.length;
-      if (sentenceLength > maxLength) {
-        // If a single sentence exceeds maxLength, split it into smaller chunks
-        const chunks = this.chunkString(sentence, maxLength);
-        if (currentGroup.length > 0) {
-          groups.push(currentGroup);
-          currentGroup = '';
-          currentLength = 0;
-        }
-        groups.push(...chunks);
-      } else {
-        // If adding the sentence exceeds maxLength, start a new group
-        if (currentLength + sentenceLength + 1 > maxLength) {
-          groups.push(currentGroup);
-          currentGroup = '';
-          currentLength = 0;
-        }
-        currentGroup += sentence + ' ';
-        currentLength += sentenceLength + 1;
+
+      // If adding the sentence exceeds targetLength, start a new group
+      if (currentLength + sentenceLength + 1 > targetLength) {
+        groups.push(currentGroup.trim());
+        currentGroup = '';
+        currentLength = 0;
       }
+
+      currentGroup += sentence + ' ';
+      currentLength += sentenceLength + 1;
     }
 
     // Add any remaining sentences as the last group

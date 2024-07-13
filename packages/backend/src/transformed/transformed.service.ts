@@ -7,7 +7,7 @@ import { ErrorHandlingService } from 'src/common/exceptions/error-handling.servi
 import { RssPrismaService } from 'src/common/prisma/rss-prisma.service';
 import { FeedGeneratorService } from 'src/common/rss-parser/feed-generator.service';
 import { JsonToXmlService } from 'src/common/rss-parser/json-to-xml.service';
-import Sum from 'src/jsx/Sum';
+import Summarized from 'src/jsx/Summarized';
 
 @Injectable()
 export class TransformedService {
@@ -33,7 +33,7 @@ export class TransformedService {
     try {
       const summarized = await this.rssPrismaService.getSummarizedByTaskId(id);
       console.log(React, 'react');
-      const jsxElement = React.createElement(Sum, { summarized });
+      const jsxElement = React.createElement(Summarized, { summarized });
       const html = ReactDOMServer.renderToString(jsxElement);
       const xml = `<?xml version="1.0" encoding="UTF-8"?>${html}`;
 
