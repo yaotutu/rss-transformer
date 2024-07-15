@@ -32,7 +32,6 @@ export class TransformedService {
   ): Promise<ApiResponse<string> | any> {
     try {
       const summarized = await this.rssPrismaService.getSummarizedByTaskId(id);
-      console.log(React, 'react');
       const jsxElement = React.createElement(Summarized, { summarized });
       const html = ReactDOMServer.renderToString(jsxElement);
       const xml = `<?xml version="1.0" encoding="UTF-8"?>${html}`;

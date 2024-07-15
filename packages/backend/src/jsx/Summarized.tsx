@@ -13,17 +13,11 @@ const Sum = (props: Props) => {
     return tags ? tags.join(', ') : '';
   };
 
-  const renderKeyPoints = (keyPoints: string[]) => {
-    return keyPoints ? keyPoints.join(', ') : '';
-  };
   const renderSummarizedContent = () => {
     return summarized.map((rss) => {
-      const {
-        title,
-        summary,
-        tags,
-        key_points: keyPoints,
-      } = JSON.parse(rss.itemTransformedInfo) as SummarizeResult;
+      const { title, summary, tags } = JSON.parse(
+        rss.itemTransformedInfo,
+      ) as SummarizeResult;
       return (
         <div key={rss.id}>
           <h3>{title}</h3>
