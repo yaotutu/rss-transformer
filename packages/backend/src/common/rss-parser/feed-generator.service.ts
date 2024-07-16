@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as Handlebars from 'handlebars';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const xmlFormat = require('xml-formatter').default || require('xml-formatter');
 
 @Injectable()
