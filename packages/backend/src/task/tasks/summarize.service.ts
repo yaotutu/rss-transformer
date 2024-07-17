@@ -56,6 +56,7 @@ export class SummarizeTask implements Task {
           tag = 'description';
         }
         const rssItemInfo = JSON.parse(item.itemOriginInfo);
+
         const targetContent =
           typeof rssItemInfo[tag] === 'string'
             ? rssItemInfo[tag]
@@ -77,7 +78,7 @@ export class SummarizeTask implements Task {
         } catch (error) {
           this.winstonService.error(
             'TASK',
-            `SummarizeTask: 处理后的数据不是一个合法的字符串, taskId: ${taskId},尝试更换大模型去解决该问题`,
+            `SummarizeTask: 处理后的数据不是一个合法的字符串, taskId: ${taskId},尝试更换大模型去解决该问题,summarizedText:${summarizedText}`,
           );
           continue;
         }
@@ -91,6 +92,7 @@ export class SummarizeTask implements Task {
           finalContent.key_points = summarizedTextObj.key_points;
           finalContent.tags = summarizedTextObj.tags;
           finalContent.status = 'success';
+          finalContent.date = new Date().toISOString();
 
           this.rssPrismaService.writeRssItemsToTransformed([
             {
@@ -116,5 +118,23 @@ export class SummarizeTask implements Task {
         true,
       );
     }
+  }
+  private parseDateString(dateString) {
+    // 解析 RFC 822 日期格式
+    const rfc822Pattern =
+      /^[a-zA-Z]{3}, \d{2} [a-zA-Z]{3} \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}$/;
+    if (rfc822Pattern.test(dateString)) {
+      return new Date(dateString);
+    }
+
+    // 解析 ISO 8601 日期格式
+    const iso8601Pattern =
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?$/;
+    if (iso8601Pattern.test(dateString)) {
+      return new Date(dateString);
+    }
+
+    // 如果不匹配任何已知格式，返回 null
+    return null;
   }
 }
