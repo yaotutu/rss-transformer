@@ -68,39 +68,45 @@ export class SummarizeTask implements Task {
             { selector: 'img', format: 'skip' },
           ],
         }).replace(/\s+/g, ' ');
-        const splitText =
-          this.textUtilsService.splitTextByLanguage(plainTextContent);
-        this.winstonService.info('TASK', `Split text: ${splitText}`);
         const finalContent = {} as SummarizeResult;
-        let isSuccess = true;
-        for (const text of splitText) {
-          const summarizedText = await this.summarizeService.summarize(text);
-          const summarizedTextObj = JSON.parse(
-            summarizedText,
-          ) as SummarizeResult;
-          if (summarizedTextObj.status === 'success') {
-            finalContent.title = rssItemInfo.title;
-            finalContent.summary = summarizedTextObj.summary;
-            finalContent.key_points = summarizedTextObj.key_points;
-            finalContent.tags = summarizedTextObj.tags;
-            finalContent.status = 'success';
-          } else {
-            isSuccess = false;
-            break;
-          }
+        const summarizedText =
+          await this.summarizeService.summarize(plainTextContent);
+        let summarizedTextObj: SummarizeResult | null = null;
+        try {
+          summarizedTextObj = JSON.parse(summarizedText) as SummarizeResult;
+        } catch (error) {
+          this.winstonService.error(
+            'TASK',
+            `SummarizeTask: 处理后的数据不是一个合法的字符串, taskId: ${taskId},尝试更换大模型去解决该问题`,
+          );
+          continue;
         }
-        if (!isSuccess) {
-          continue; // Skip writing the RSS item if there was an error
+
+        if (
+          summarizedTextObj.status &&
+          summarizedTextObj.status === 'success'
+        ) {
+          finalContent.title = rssItemInfo.title;
+          finalContent.summary = summarizedTextObj.summary;
+          finalContent.key_points = summarizedTextObj.key_points;
+          finalContent.tags = summarizedTextObj.tags;
+          finalContent.status = 'success';
+
+          this.rssPrismaService.writeRssItemsToTransformed([
+            {
+              rssItemId: item.id,
+              taskId: taskId,
+              uniqueArticleId: item.uniqueArticleId,
+              itemUrl: item.itemUrl,
+              itemTransformedInfo: JSON.stringify(finalContent),
+            },
+          ]);
+          this.winstonService.info(
+            'TASK',
+            `SummarizeTask: finished task ${taskId}`,
+          );
+        } else {
         }
-        this.rssPrismaService.writeRssItemsToTransformed([
-          {
-            rssItemId: item.id,
-            taskId: taskId,
-            uniqueArticleId: item.uniqueArticleId,
-            itemUrl: item.itemUrl,
-            itemTransformedInfo: JSON.stringify(finalContent),
-          },
-        ]);
       }
     } catch (error) {
       this.errorHandlingService.handleError(
@@ -110,7 +116,5 @@ export class SummarizeTask implements Task {
         true,
       );
     }
-
-    this.winstonService.info('TASK', `SummarizeTask: finished task ${taskId}`);
   }
 }

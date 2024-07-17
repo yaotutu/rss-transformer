@@ -14,7 +14,9 @@ export class SummarizeService {
     content: string,
     output_language: string = '简体中文',
   ): Promise<string> {
-    this.model = this.modelFactory.getModel('OpenAI');
+    this.model = this.modelFactory.getModel('Ollama');
+    const maxLength = 1000;
+    const finalContent = content.slice(0, maxLength); // 限制输入长度
     const prompt = ChatPromptTemplate.fromMessages([
       [
         'system',
@@ -51,7 +53,7 @@ export class SummarizeService {
     const parser = new StringOutputParser();
     try {
       const chain = prompt.pipe(this.model).pipe(parser);
-      const result = await chain.invoke({ input: content, verbose: true });
+      const result = await chain.invoke({ input: finalContent, verbose: true });
       return result.trim(); // 返回翻译后的单段结果
     } catch (error) {
       console.error('Error summarizing content:', error);
