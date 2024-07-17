@@ -48,6 +48,7 @@ model RssTransformed {
   uniqueArticleId     String // 根据文章内容+url hash生成的当前任务下的唯一id
   itemUrl             String // 文章 URL
   itemTransformedInfo String? // 每一个处理后 RSS 条目的原始信息
+  itemOriginDate      String? // 原始文章的发布时间
   feedType            String? // RSS 类型 atom/rss
   createdAt           DateTime @default(now()) // 创建时间，默认为当前时间
   updatedAt           DateTime @updatedAt // 更新时间戳，系统自动生成
