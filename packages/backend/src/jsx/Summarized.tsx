@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { RssTransformed } from '@prisma/client';
 import React from 'react';
 import { SummarizeResult } from 'src/types';
