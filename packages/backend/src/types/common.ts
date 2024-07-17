@@ -33,4 +33,5 @@ export type SummarizeResult = {
   key_points: string[];
   tags: string[];
   status: 'success' | 'error' | 'timeout';
+  date: string;
 };
