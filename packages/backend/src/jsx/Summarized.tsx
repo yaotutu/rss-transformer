@@ -20,8 +20,8 @@ const partitionArray = (arr, size) => {
   }
   return result;
 };
-const Sum = (props: Props) => {
-  const { summarized, archiveType = 'count', count = 5 } = props;
+const Summarized = (props: Props) => {
+  const { summarized, count = 5 } = props;
   const rendertags = (tags: string[]) => {
     return tags ? tags.join(', ') : '';
   };
@@ -78,4 +78,4 @@ const Sum = (props: Props) => {
   );
 };
 
-export default Sum;
+export default Summarized;
