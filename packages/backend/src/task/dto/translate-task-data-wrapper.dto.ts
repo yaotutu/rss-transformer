@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { TranslateTaskDataDto } from './translate-task-data.dto';
 // import other DTOs as needed
 

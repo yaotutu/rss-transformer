@@ -1,4 +1,13 @@
-# 自定义任务配置指南
+
+
+
+
+ ## 配置千帆模型
+ export QIANFAN_ACCESS_KEY="your_access_key"
+ export QIANFAN_SECRET_KEY="your_secret_key"
+
+
+## 自定义任务配置指南
 
 本指南旨在帮助您配置和使用自定义任务。自定义任务允许您根据特定需求执行预定义的函数，如 `genericLlm`，这是一个通用的大型语言模型函数。
 

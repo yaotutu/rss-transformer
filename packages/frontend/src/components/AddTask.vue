@@ -88,6 +88,11 @@ with a flex layout. * - .header: Styles the header section with a flex layout.
             label="翻译任务"
             value="TRANSLATE"
           ></el-option>
+          <el-option
+            key="SUMMRIZE"
+            label="总结任务"
+            value="SUMMRIZE"
+          ></el-option>
           <el-option key="CUSTOM" label="自定义任务" value="CUSTOM"></el-option>
         </el-select>
       </el-form-item>

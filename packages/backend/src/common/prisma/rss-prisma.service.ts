@@ -5,11 +5,11 @@ import {
   RssSource,
   RssTransformed,
 } from '@prisma/client';
-import { WinstonService } from '../logger/winston.service';
-import { ApiResponse } from '../dto/common.dto';
-import { BasePrismaService } from './base-prisma.service';
 import { OmitMultiple } from 'src/types';
+import { ApiResponse } from '../dto/common.dto';
 import { ErrorHandlingService } from '../exceptions/error-handling.service';
+import { WinstonService } from '../logger/winston.service';
+import { BasePrismaService } from './base-prisma.service';
 
 /**
  * Service for interacting with Prisma client to manage RSS sources and items.
@@ -358,7 +358,22 @@ export class RssPrismaService extends BasePrismaService {
         `Failed to retrieve RssTransformed items with origin info for task ID ${taskId}.`,
         error,
       );
-      throw error;
+    }
+  }
+
+  async getSummarizedByTaskId(
+    taskId: number,
+  ): Promise<RssTransformed[] | ApiResponse<string>> {
+    try {
+      return await this.prisma.rssTransformed.findMany({
+        where: { taskId },
+      });
+    } catch (error) {
+      this.handlePrismaError(
+        `任务${taskId} 未能获取到总结后的数据.`,
+        error,
+        true,
+      );
     }
   }
 
